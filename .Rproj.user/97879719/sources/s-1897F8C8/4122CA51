@@ -5,14 +5,14 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "534970901",
+    "hash" : "0",
     "id" : "4122CA51",
-    "lastKnownWriteTime" : 1506866896,
-    "last_content_update" : 1506866896500,
+    "lastKnownWriteTime" : 1506867317,
+    "last_content_update" : 1506867317,
     "path" : "~/Documents/peakmaximum/config.toml",
     "project_path" : "config.toml",
     "properties" : {
-        "cursorPosition" : "6,19",
+        "cursorPosition" : "4,20",
         "scrollLine" : "0"
     },
     "relative_order" : 1,

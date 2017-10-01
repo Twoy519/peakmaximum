@@ -1,7 +1,7 @@
 baseurl = "/"
 languageCode = "en-us"
 title = "The Personal Blog of Troy Porter"
-theme = "hugo-lithium-theme"
+theme = "hyde-x"
 googleAnalytics = ""
 disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]

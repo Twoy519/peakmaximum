@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Maximuming At The Peak</title>
-    <link>/</link>
-    <description>Recent content on Maximuming At The Peak</description>
+    <title>R on Maximuming At The Peak</title>
+    <link>/tags/r/</link>
+    <description>Recent content in R on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 01 Oct 2017 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,15 +19,6 @@
       <guid>/2017/10/01/the-train-schedule/</guid>
       <description>This website needs content. I don&amp;rsquo;t really know what to write at the moment so I&amp;rsquo;m going to just start with a simple recreation of a 137 year old data visualization to get things rolling. I could have chosen to write about Napoleon&amp;rsquo;s infamous march but plenty of people write about that already.
 I recently purchased a copy of https://www.amazon.co.uk/Visual-Display-Quantitative-Information/dp/0961392142 by Edward Tufte. The cover image is a photo of E.</description>
-    </item>
-    
-    <item>
-      <title>About Me</title>
-      <link>/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/about/</guid>
-      <description>My name is Troy. I am a data analyst based in London. Everything I write here represents my own thought and opinions.</description>
     </item>
     
   </channel>

@@ -6,20 +6,19 @@
     <description>Recent content in R on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Jul 2015 21:13:14 -0500</lastBuildDate>
+    <lastBuildDate>Sun, 01 Oct 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Hello R Markdown</title>
-      <link>/2015/07/23/hello-r-markdown/</link>
-      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      <title>The Train Schedule</title>
+      <link>/2017/10/01/the-train-schedule/</link>
+      <pubDate>Sun, 01 Oct 2017 00:00:00 +0000</pubDate>
       
-      <guid>/2015/07/23/hello-r-markdown/</guid>
-      <description>R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
-You can embed an R code chunk like this:
-summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+      <guid>/2017/10/01/the-train-schedule/</guid>
+      <description>This website needs content. I don&amp;rsquo;t really know what to write at the moment so I&amp;rsquo;m going to just start with a simple recreation of a 137 year old data visualization to get things rolling. I could have chosen to write about Napoleon&amp;rsquo;s infamous march but plenty of people write about that already.
+I recently purchased a copy of https://www.amazon.co.uk/Visual-Display-Quantitative-Information/dp/0961392142 by Edward Tufte. The cover image is a photo of E.</description>
     </item>
     
   </channel>

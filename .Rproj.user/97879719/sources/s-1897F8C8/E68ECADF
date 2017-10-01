@@ -1,21 +1,21 @@
 {
     "collab_server" : "",
     "contents" : "",
-    "created" : 1506875199477.000,
+    "created" : 1506883628896.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
     "hash" : "0",
-    "id" : "8C781744",
+    "id" : "E68ECADF",
     "lastKnownWriteTime" : 1506876196,
-    "last_content_update" : 1506876196369,
+    "last_content_update" : 1506876196,
     "path" : "~/Documents/peakmaximum/content/about.md",
     "project_path" : "content/about.md",
     "properties" : {
-        "cursorPosition" : "6,65",
+        "cursorPosition" : "4,0",
         "scrollLine" : "0"
     },
-    "relative_order" : 2,
+    "relative_order" : 3,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "markdown"

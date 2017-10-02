@@ -202,9 +202,9 @@ head(td_g)</code></pre>
     &quot;atherton&quot;, &quot;menlo_park&quot;, &quot;palo_alto&quot;, &quot;california_ave&quot;, &quot;san_antonio&quot;, 
     &quot;mountainview&quot;, &quot;sunnyvale&quot;, &quot;lawrence&quot;, &quot;santaclara&quot;, &quot;college_park&quot;, &quot;san_jose&quot;, 
     &quot;tamien&quot;, &quot;capitol&quot;, &quot;blossom_hill&quot;, &quot;morgan_hill&quot;, &quot;san_martin&quot;, &quot;gilroy&quot;)), 
-    number = as.factor(number))</code></pre>
+    number = as.factor(number), direction = as.factor(direction))</code></pre>
 <p>So the structure of the plot is: * Time is represented across the x-axis * The y-axis is each station * Each Train will be an individual line</p>
-<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them 😟</p>
+<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them 😞</p>
 <p>Good thing we made a backup of the data in its raw imported form.</p>
 <pre class="r"><code>cities &lt;- unique(td_g$station)
 
@@ -232,4 +232,21 @@ head(city_distances)</code></pre>
     breaks = unique(-td_g$distance)) + scale_color_viridis(discrete = T, direction = -1, 
     option = &quot;B&quot;, end = 0.7)</code></pre>
 <p><img src="/post/2017-10-01-the-train-schedule_files/figure-html/plot_try_one-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>To make this easier to look at let’s filter to just between 6am and noon.</p>
+<pre class="r"><code>plot_df &lt;- td_g %&gt;% filter(time &gt;= as.POSIXct(&quot;2017-10-02 06:00:00&quot;), time &lt;= 
+    as.POSIXct(&quot;2017-10-02 12:00:00&quot;))
+
+ggplot(plot_df, aes(x = time, y = -distance, group = number, color = direction)) + 
+    geom_line(size = 0.25) + theme_minimal() + theme(legend.position = &quot;none&quot;, 
+    axis.title = element_blank(), panel.grid.minor = element_blank()) + scale_y_continuous(labels = c(&quot;san_francisco&quot;, 
+    &quot;22nd_street&quot;, &quot;bayshore&quot;, &quot;so_san_francisco&quot;, &quot;san_bruno&quot;, &quot;millbrae&quot;, 
+    &quot;broadway&quot;, &quot;burlingame&quot;, &quot;san_mateo&quot;, &quot;hayward_park&quot;, &quot;hillsdale&quot;, &quot;belmont&quot;, 
+    &quot;san_carlos&quot;, &quot;redwood_city&quot;, &quot;atherton&quot;, &quot;menlo_park&quot;, &quot;palo_alto&quot;, &quot;california_ave&quot;, 
+    &quot;san_antonio&quot;, &quot;mountainview&quot;, &quot;sunnyvale&quot;, &quot;lawrence&quot;, &quot;santaclara&quot;, &quot;college_park&quot;, 
+    &quot;san_jose&quot;, &quot;tamien&quot;, &quot;capitol&quot;, &quot;blossom_hill&quot;, &quot;morgan_hill&quot;, &quot;san_martin&quot;, 
+    &quot;gilroy&quot;), breaks = c(-0, -40, -124, -178, -216, -249, -280, -307, -334, 
+    -354, -391, -428, -458, -499, -543, -574, -604, -649, -676, -702, -731, 
+    -757, -805, -833, -862, -906, -939, -966, -997, -1021, -1053)) + scale_color_manual(values = c(&quot;#F76F5CFF&quot;, 
+    &quot;#000004FF&quot;))</code></pre>
+<p><img src="/post/2017-10-01-the-train-schedule_files/figure-html/filtered_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>

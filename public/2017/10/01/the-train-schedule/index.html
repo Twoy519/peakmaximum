@@ -276,7 +276,7 @@ head(td_g)</code></pre>
     &quot;tamien&quot;, &quot;capitol&quot;, &quot;blossom_hill&quot;, &quot;morgan_hill&quot;, &quot;san_martin&quot;, &quot;gilroy&quot;)), 
     number = as.factor(number))</code></pre>
 <p>So the structure of the plot is: * Time is represented across the x-axis * The y-axis is each station * Each Train will be an individual line</p>
-<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them.</p>
+<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them 😟</p>
 <p>Good thing we made a backup of the data in its raw imported form.</p>
 <pre class="r"><code>cities &lt;- unique(td_g$station)
 

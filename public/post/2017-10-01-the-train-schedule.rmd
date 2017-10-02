@@ -205,7 +205,7 @@ So the structure of the plot is:
 * The y-axis is each station
 * Each Train will be an individual line
 
-We're missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them.
+We're missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them `r emo::ji(":(")`
 
 Good thing we made a backup of the data in its raw imported form.
 

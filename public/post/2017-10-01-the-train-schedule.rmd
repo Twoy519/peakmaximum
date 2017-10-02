@@ -36,9 +36,6 @@ library( magrittr)
 # Use ggplot because the only reason I haven't learned Python yet is because plotting in Python is my nightmare.
 library( ggplot2)
 
-# Use knitr because tables
-library( knitr)
-
 # Use lubridate because timestamps are the worst.
 # I hate them. So. Much.
 library( lubridate)
@@ -68,11 +65,9 @@ td <- td_backup
 
 That's nice. Let's see what we just got.
 
-First let's use `knitr::kable()` and `head()` to just see what columns we have.
-
 ```{r glimpse_td, message=FALSE, warning=FALSE, error=FALSE}
 
-kable(td %>% head())
+head(td)
 
 ```
 
@@ -202,10 +197,7 @@ We're missing something important though, the distance the trains are traveling.
 
 Good thing we made a backup of the data in its raw imported form.
 
-`r colnames(td_backup)`
-
 ```{r munge_distance, error=F, message=F, warning=F}
-
 cities <- unique(td_g$station)
 
 distance <- c(0,40,124,178,216,249,280,307,334,354,391,428,458,499,543,574,604,649,676,702,731,757,805,833,862,906,939,966,997,1021,1053)

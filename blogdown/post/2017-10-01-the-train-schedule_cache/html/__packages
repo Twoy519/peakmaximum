@@ -1,0 +1,11 @@
+base
+readr
+tidyr
+dplyr
+magrittr
+ggplot2
+lubridate
+viridisLite
+viridis
+emo
+bindrcpp

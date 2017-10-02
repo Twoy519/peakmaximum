@@ -1,0 +1,5 @@
+"0","td_g %<>%
+  inner_join(city_distance, by=c('station' = 'cities'))
+"
+"2","Error in tbl_vars(y) : object 'city_distance' not found
+"

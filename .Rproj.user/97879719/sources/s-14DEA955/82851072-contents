@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 ```
 
 
-```{r, echo=F, out.width = "400px"}
+```{r, echo=F, out.width = "300px"}
 knitr::include_graphics("/img/train_schedule.png")
 ```
 

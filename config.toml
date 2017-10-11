@@ -1,7 +1,7 @@
 baseurl = "/"
 languageCode = "en-us"
 title = "Maximuming At The Peak"
-theme = "hyde-x"
+theme = "hugo-theme-cactus-plus"
 googleAnalytics = ""
 disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]

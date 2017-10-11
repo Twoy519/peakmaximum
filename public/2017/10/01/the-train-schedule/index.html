@@ -1,89 +1,67 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <link href="http://gmpg.org/xfn/11" rel="profile">
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="A website built through Hugo and blogdown.">
+		<meta name="generator" content="Hugo 0.27" />
+		<title>The Train Schedule &middot; Maximuming At The Peak</title>
+		<link rel="shortcut icon" href="/images/favicon.ico">
+		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/highlight.css">
+		
 
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+		
+		<link rel="stylesheet" href="/css/monosocialiconsfont.css">
+		
 
-  <title>The Train Schedule &middot; </title>
+		
+	</head>
 
-  
-  <link rel="stylesheet" href="/css/poole.css">
-  <link rel="stylesheet" href="/css/hyde.css">
-  <link rel="stylesheet" href="/css/poole-overrides.css">
-  <link rel="stylesheet" href="/css/hyde-overrides.css">
-  <link rel="stylesheet" href="/css/hyde-x.css">
-  <link rel="stylesheet" href="/css/highlight/github.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='/post'>Archive</a>
+	<a href='/tags'>Tags</a>
+	<a href='/about'>About</a>
 
-  
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/touch-icon-144-precomposed.png">
-  <link href="/favicon.png" rel="icon">
+	
 
-  
-  
-  
-  
-
-  <meta name="description" content="Recreating The Train Schedule Visualization from The Visual Display of Quantitative Information">
-  <meta name="keywords" content="dataviz">
-  
-</head>
-<body>
-<div class="sidebar">
-  <div class="container sidebar-sticky">
-    <div class="sidebar-about">
-      
-      <h1></h1>
-      
-    </div>
-
-    <ul class="sidebar-nav">
-      <li class="sidebar-nav-item"><a href="/">Blog</a></li>
-      
-      <li class="sidebar-nav-item"><a href="/about/">About</a></li>
-      
-      <li class="sidebar-nav-item"><a href="https://github.com/Twoy519">GitHub</a></li>
-      
-      <li class="sidebar-nav-item"><a href="https://twitter.com/_T_R_O_Y">Twitter</a></li>
-      
-    </ul>
-
-    <ul class="sidebar-nav">
-      <li class="sidebar-nav-item">
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      </li>
-    </ul>
-
-    
-
-    <p>Copyright &copy; 2017 <a href="/license/">License</a><br/>
-       Powered by <a href="http://gohugo.io">Hugo</a> and <a href="https://github.com/zyro/hyde-x">Hyde-X</a></p>
-  </div>
-</div>
+	
+</nav>
 
 
-<div class="content container">
-  <div class="post">
-    <h1 class="post-title">The Train Schedule</h1>
-    <span class="post-date">Oct 1, 2017 &middot; 9 minute read
-    
-    <br/>
-    <a class="label" href="/categories/data-visualization">Data Visualization</a><a class="label" href="/categories/r">R</a>
-    </span>
-    <p><img src="/img/train_schedule.png" width="300px" style="display: block; margin: auto;" /></p>
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        The Train Schedule
+                    </h1>
+                    <h2 class="headline">
+                    Oct 1, 2017 00:00
+                    · 1783 words
+                    · 9 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="/tags/r">R</a>
+                          
+                              <a href="/tags/dataviz">DataViz</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p><img src="/img/train_schedule.png" width="300px" style="display: block; margin: auto;" /></p>
 <p>This website needs content. I don’t really know what to write at the moment so I’m going to just start with a simple recreation of a famous old ( originally made 137 years ago) visualization to get things rolling. I could have chosen to write about Napoleon’s infamous march but <a href="https://robots.thoughtbot.com/analyzing-minards-visualization-of-napoleons-1812-march">plenty</a> <a href="https://datavizblog.com/2013/05/26/dataviz-history-charles-minards-flow-map-of-napoleons-russian-campaign-of-1812-part-5/">of</a> <a href="https://flowingdata.com/2008/07/17/is-minards-map-of-napoleons-march-the-greatest-statistical-graphic-ever/">people</a> <a href="https://www.youtube.com/watch?v=PYwwSHpPZdc">wrote</a> <a href="http://bigthink.com/strange-maps/229-vital-statistics-of-a-deadly-campaign-the-minard-map">about</a> <a href="http://fportman.com/blog/visualizing-napoleon-s-march-to-moscow/">that</a> <a href="https://cartographia.wordpress.com/2008/04/30/napoleons-invasion-of-russia/">already</a>.</p>
 <p>I recently purchased a copy of <a href="The%20Visual%20Display%20of%20Quantitative%20Information">https://www.amazon.co.uk/Visual-Display-Quantitative-Information/dp/0961392142</a> by Edward Tufte. The cover image is a photo of E.J. Marey’s visualization of train scheduls for Paris to Lyon. I’ll go ahead and try to recreate this in R.</p>
 <p>First, let’s load the packages we need.</p>
@@ -223,12 +201,12 @@ head(td)</code></pre>
 <pre><code>## # A tibble: 6 x 34
 ##   number  type direction       san_francisco       `22nd_street`
 ##    &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;              &lt;dttm&gt;              &lt;dttm&gt;
-## 1    102     N         S 2017-10-02 04:55:00 2017-10-02 05:00:00
-## 2    104     N         S 2017-10-02 05:25:00 2017-10-02 05:30:00
-## 3    206     L         S 2017-10-02 06:11:00 2017-10-02 06:16:00
-## 4    208     L         S 2017-10-02 06:24:00 2017-10-02 06:29:00
-## 5    210     L         S 2017-10-02 06:44:00 2017-10-02 06:49:00
-## 6    312     B         S 2017-10-02 06:59:00 2017-10-02 07:04:00
+## 1    102     N         S 2017-10-11 04:55:00 2017-10-11 05:00:00
+## 2    104     N         S 2017-10-11 05:25:00 2017-10-11 05:30:00
+## 3    206     L         S 2017-10-11 06:11:00 2017-10-11 06:16:00
+## 4    208     L         S 2017-10-11 06:24:00 2017-10-11 06:29:00
+## 5    210     L         S 2017-10-11 06:44:00 2017-10-11 06:49:00
+## 6    312     B         S 2017-10-11 06:59:00 2017-10-11 07:04:00
 ## # ... with 29 more variables: bayshore &lt;dttm&gt;, so_san_francisco &lt;dttm&gt;,
 ## #   san_bruno &lt;dttm&gt;, millbrae &lt;dttm&gt;, broadway &lt;dttm&gt;, burlingame &lt;dttm&gt;,
 ## #   san_mateo &lt;dttm&gt;, hayward_park &lt;dttm&gt;, hillsdale &lt;dttm&gt;,
@@ -250,23 +228,23 @@ head(td_g)</code></pre>
 <pre><code>## # A tibble: 6 x 5
 ##   number  type direction       station                time
 ##    &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;chr&gt;              &lt;dttm&gt;
-## 1    102     N         S san_francisco 2017-10-02 04:55:00
-## 2    104     N         S san_francisco 2017-10-02 05:25:00
-## 3    206     L         S san_francisco 2017-10-02 06:11:00
-## 4    208     L         S san_francisco 2017-10-02 06:24:00
-## 5    210     L         S san_francisco 2017-10-02 06:44:00
-## 6    312     B         S san_francisco 2017-10-02 06:59:00</code></pre>
+## 1    102     N         S san_francisco 2017-10-11 04:55:00
+## 2    104     N         S san_francisco 2017-10-11 05:25:00
+## 3    206     L         S san_francisco 2017-10-11 06:11:00
+## 4    208     L         S san_francisco 2017-10-11 06:24:00
+## 5    210     L         S san_francisco 2017-10-11 06:44:00
+## 6    312     B         S san_francisco 2017-10-11 06:59:00</code></pre>
 <p>Just as a sanity check, we should have a bunch of new rows per train</p>
 <pre class="r"><code>td_g %&gt;% filter(number == 102) %&gt;% head()</code></pre>
 <pre><code>## # A tibble: 6 x 5
 ##   number  type direction          station                time
 ##    &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;            &lt;chr&gt;              &lt;dttm&gt;
-## 1    102     N         S    san_francisco 2017-10-02 04:55:00
-## 2    102     N         S      22nd_street 2017-10-02 05:00:00
-## 3    102     N         S         bayshore 2017-10-02 05:05:00
-## 4    102     N         S so_san_francisco 2017-10-02 05:11:00
-## 5    102     N         S        san_bruno 2017-10-02 05:15:00
-## 6    102     N         S         millbrae 2017-10-02 05:19:00</code></pre>
+## 1    102     N         S    san_francisco 2017-10-11 04:55:00
+## 2    102     N         S      22nd_street 2017-10-11 05:00:00
+## 3    102     N         S         bayshore 2017-10-11 05:05:00
+## 4    102     N         S so_san_francisco 2017-10-11 05:11:00
+## 5    102     N         S        san_bruno 2017-10-11 05:15:00
+## 6    102     N         S         millbrae 2017-10-11 05:19:00</code></pre>
 <p>The order of the stations is important. Let’s factor the station field and set the levels to the correct order. The train number should also be a factor.</p>
 <pre class="r"><code>td_g %&lt;&gt;% mutate(station = factor(station, levels = c(&quot;san_francisco&quot;, &quot;22nd_street&quot;, 
     &quot;bayshore&quot;, &quot;so_san_francisco&quot;, &quot;san_bruno&quot;, &quot;millbrae&quot;, &quot;broadway&quot;, &quot;burlingame&quot;, 
@@ -276,7 +254,7 @@ head(td_g)</code></pre>
     &quot;tamien&quot;, &quot;capitol&quot;, &quot;blossom_hill&quot;, &quot;morgan_hill&quot;, &quot;san_martin&quot;, &quot;gilroy&quot;)), 
     number = as.factor(number), direction = as.factor(direction))</code></pre>
 <p>So the structure of the plot is: * Time is represented across the x-axis * The y-axis is each station * Each Train will be an individual line</p>
-<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them 😞</p>
+<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them 😟</p>
 <p>Good thing we made a backup of the data in its raw imported form.</p>
 <pre class="r"><code>cities &lt;- unique(td_g$station)
 
@@ -305,33 +283,48 @@ head(city_distances)</code></pre>
     option = &quot;B&quot;, end = 0.7)</code></pre>
 <p><img src="/post/2017-10-01-the-train-schedule_files/figure-html/plot_try_one-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>To make this easier to look at let’s filter to just between 6am and noon.</p>
-<pre class="r"><code>plot_df &lt;- td_g %&gt;% filter(time &gt;= as.POSIXct(&quot;2017-10-02 06:00:00&quot;), time &lt;= 
-    as.POSIXct(&quot;2017-10-02 12:00:00&quot;))
+<pre class="r"><code>plot_df &lt;- td_g
 
 ggplot(plot_df, aes(x = time, y = -distance, group = number, color = direction)) + 
     geom_line(size = 0.25) + theme_minimal() + theme(legend.position = &quot;none&quot;, 
-    axis.title = element_blank(), panel.grid.minor = element_blank()) + scale_y_continuous(labels = c(&quot;san_francisco&quot;, 
-    &quot;22nd_street&quot;, &quot;bayshore&quot;, &quot;so_san_francisco&quot;, &quot;san_bruno&quot;, &quot;millbrae&quot;, 
-    &quot;broadway&quot;, &quot;burlingame&quot;, &quot;san_mateo&quot;, &quot;hayward_park&quot;, &quot;hillsdale&quot;, &quot;belmont&quot;, 
-    &quot;san_carlos&quot;, &quot;redwood_city&quot;, &quot;atherton&quot;, &quot;menlo_park&quot;, &quot;palo_alto&quot;, &quot;california_ave&quot;, 
-    &quot;san_antonio&quot;, &quot;mountainview&quot;, &quot;sunnyvale&quot;, &quot;lawrence&quot;, &quot;santaclara&quot;, &quot;college_park&quot;, 
-    &quot;san_jose&quot;, &quot;tamien&quot;, &quot;capitol&quot;, &quot;blossom_hill&quot;, &quot;morgan_hill&quot;, &quot;san_martin&quot;, 
-    &quot;gilroy&quot;), breaks = c(-0, -40, -124, -178, -216, -249, -280, -307, -334, 
-    -354, -391, -428, -458, -499, -543, -574, -604, -649, -676, -702, -731, 
-    -757, -805, -833, -862, -906, -939, -966, -997, -1021, -1053)) + scale_color_manual(values = c(&quot;#F76F5CFF&quot;, 
-    &quot;#000004FF&quot;))</code></pre>
+    axis.title = element_blank(), panel.grid.minor = element_blank()) + scale_y_continuous(labels = cities, 
+    breaks = -distance) + scale_color_manual(values = c(&quot;#F76F5CFF&quot;, &quot;#000004FF&quot;))</code></pre>
 <p><img src="/post/2017-10-01-the-train-schedule_files/figure-html/filtered_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 
-  </div>
-  
-</div>
+                </section>
+            </article>
 
+            
 
+            
 
+            
 
-<script src="/js/highlight.pack.js"></script>
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2017 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="/js/jquery-2.2.4.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
-</body>
-</html>
 
+
+
+
+
+
+
+    </body>
+</html>

@@ -35,7 +35,7 @@ I recently purchased a copy of [https://www.amazon.co.uk/Visual-Display-Quantita
 
 First, let's load the packages we need.
 
-```{r fireItUp}
+```{r fireItUp, warning = FALSE, message = FALSE, error = FALSE}
 
 # Install readr because we need to interact with the outside world.
 library( readr)
@@ -68,7 +68,7 @@ Forunately, the fabled deity Mike Bostock [has done this before](https://bl.ocks
 
 Let's use that.
 
-```{r plagiarizeMikeBostockAgain}
+```{r plagiarizeMikeBostockAgain, message = FALSE}
 
 # td means 'Train Data'
 td <- read_tsv("https://gist.githubusercontent.com/mbostock/5544008/raw/446592acc3a9223ad268c7b051a68b814e40789c/schedule.tsv")
@@ -123,7 +123,7 @@ Calling this function will yield: `r lubridate::parse_date_time('7:04am','%I:%M%
 
 The SF and San Jose columns are in the more straightforward `%H:%M:%s` format.
 
-```{r munge_timestamps}
+```{r munge_timestamps, message = FALSE, warning = FALSE}
 
 td %<>%
   mutate(
@@ -264,10 +264,7 @@ To make this easier to look at let's filter to just between 6am and noon.
 
 ```{r filtered_plot}
 
-plot_df <- td_g %>% filter(
-    time >= as.POSIXct('2017-10-02 06:00:00')
-    , time <= as.POSIXct('2017-10-02 12:00:00')
-  )
+plot_df <- td_g
 
 ggplot(
   plot_df
@@ -286,8 +283,8 @@ ggplot(
     , panel.grid.minor = element_blank()
   ) +
   scale_y_continuous(
-    labels = c('san_francisco','22nd_street','bayshore','so_san_francisco','san_bruno','millbrae','broadway','burlingame','san_mateo','hayward_park','hillsdale','belmont','san_carlos','redwood_city','atherton','menlo_park','palo_alto','california_ave','san_antonio','mountainview','sunnyvale','lawrence','santaclara','college_park','san_jose','tamien','capitol','blossom_hill','morgan_hill','san_martin','gilroy')
-    , breaks = c(-0,-40,-124,-178,-216,-249,-280,-307,-334,-354,-391,-428,-458,-499,-543,-574,-604,-649,-676,-702,-731,-757,-805,-833,-862,-906,-939,-966,-997,-1021,-1053)
+    labels = cities
+    , breaks = -distance
     ) +
   scale_color_manual(values=c("#F76F5CFF", "#000004FF"))
 

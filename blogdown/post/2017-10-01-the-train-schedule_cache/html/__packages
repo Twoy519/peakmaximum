@@ -4,8 +4,10 @@ tidyr
 dplyr
 magrittr
 ggplot2
-lubridate
 viridisLite
 viridis
+lubridate
+purrr
 emo
+knitr
 bindrcpp

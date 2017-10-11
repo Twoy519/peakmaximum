@@ -315,7 +315,7 @@ em, i {
 
 .home h1 {
     font-size: 30px;
-    letter-spacing: -1px;
+    /* letter-spacing: -1px; */
     color: #222;
     font-weight: bold;
 }

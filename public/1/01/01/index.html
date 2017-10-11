@@ -1,0 +1,758 @@
+<p>‘san_francisco’ ,‘22nd_street’ ,‘bayshore’ ,‘so_san_francisco’ ,‘san_bruno’ ,‘millbrae’ ,‘broadway’ ,‘burlingame’ ,‘san_mateo’ ,‘hayward_park’ ,‘hillsdale’ ,‘belmont’ ,‘san_carlos’ ,‘redwood_city’ ,‘atherton’ ,‘menlo_park’ ,‘palo_alto’ ,‘california_ave’ ,‘san_antonio’ ,‘mountainview’ ,‘sunnyvale’ ,‘lawrence’ ,‘santaclara’ ,‘college_park’ ,‘san_jose’ ,‘tamien’ ,‘capitol’ ,‘blossom_hill’ ,‘morgan_hill’ ,‘san_martin’ ,‘gilroy’— title: The Train Schedule author: porter date: ‘2017-10-01’ slug: the-train-schedule categories: [‘Data Visualization’,‘R’] tags: [‘R’,‘DataViz’] description: ‘Recreating The Train Schedule Visualization from The Visual Display of Quantitative Information’ keywords: [‘dataviz’] —</p>
+<pre class="r"><code>knitr::include_graphics(&quot;/img/train_schedule.png&quot;)</code></pre>
+<p><img src="/img/train_schedule.png" width="300px" style="display: block; margin: auto;" /></p>
+<p>This website needs content. I don’t really know what to write at the moment so I’m going to just start with a simple recreation of a famous old ( originally made 137 years ago) visualization to get things rolling. I could have chosen to write about Napoleon’s infamous march but <a href="https://robots.thoughtbot.com/analyzing-minards-visualization-of-napoleons-1812-march">plenty</a> <a href="https://datavizblog.com/2013/05/26/dataviz-history-charles-minards-flow-map-of-napoleons-russian-campaign-of-1812-part-5/">of</a> <a href="https://flowingdata.com/2008/07/17/is-minards-map-of-napoleons-march-the-greatest-statistical-graphic-ever/">people</a> <a href="https://www.youtube.com/watch?v=PYwwSHpPZdc">wrote</a> <a href="http://bigthink.com/strange-maps/229-vital-statistics-of-a-deadly-campaign-the-minard-map">about</a> <a href="http://fportman.com/blog/visualizing-napoleon-s-march-to-moscow/">that</a> <a href="https://cartographia.wordpress.com/2008/04/30/napoleons-invasion-of-russia/">already</a>.</p>
+<p>I recently purchased a copy of <a href="The%20Visual%20Display%20of%20Quantitative%20Information">https://www.amazon.co.uk/Visual-Display-Quantitative-Information/dp/0961392142</a> by Edward Tufte. The cover image is a photo of E.J. Marey’s visualization of train scheduls for Paris to Lyon. I’ll go ahead and try to recreate this in R.</p>
+<p>First, let’s load the packages we need.</p>
+<pre class="r"><code>library(readr)  # read in data
+library(tidyr)  # clean it up
+library(dplyr)  # make love to the clay
+library(magrittr)  # %&lt;&gt;%
+library(ggplot2)  # Viz
+library(viridis)  # Pretty colors
+library(lubridate)  # Time sucks
+library(purrr)  # Apply functions over df
+library(emo)  # Emojis. Cuz
+library(knitr)  # kable()</code></pre>
+<p>Forunately, the fabled deity Mike Bostock <a href="https://bl.ocks.org/mbostock/5544008">has done this before</a> and <a href="https://gist.githubusercontent.com/mbostock/5544008/raw/446592acc3a9223ad268c7b051a68b814e40789c/schedule.tsv">uploaded the data to his github</a> already.</p>
+<p>Let’s use that.</p>
+<pre class="r"><code># td means &#39;Train Data&#39;
+td &lt;- read_tsv(&quot;https://gist.githubusercontent.com/mbostock/5544008/raw/446592acc3a9223ad268c7b051a68b814e40789c/schedule.tsv&quot;)
+
+td_backup &lt;- td</code></pre>
+<p>That’s nice. Let’s see what we just got.</p>
+<pre class="r"><code>kable(head(td))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">number</th>
+<th align="left">type</th>
+<th align="left">direction</th>
+<th align="left">stop|San Francisco|0|1</th>
+<th align="left">stop|22nd Street|40|1</th>
+<th align="left">stop|Bayshore|124|1</th>
+<th align="left">stop|So. San Francisco|178|1</th>
+<th align="left">stop|San Bruno|216|1</th>
+<th align="left">stop|Millbrae|249|2</th>
+<th align="left">stop|Broadway|280|2</th>
+<th align="left">stop|Burlingame|307|2</th>
+<th align="left">stop|San Mateo|334|2</th>
+<th align="left">stop|Hayward Park|354|2</th>
+<th align="left">stop|Hillsdale|391|2</th>
+<th align="left">stop|Belmont|428|2</th>
+<th align="left">stop|San Carlos|458|2</th>
+<th align="left">stop|Redwood City|499|2</th>
+<th align="left">stop|Atherton|543|3</th>
+<th align="left">stop|Menlo Park|574|3</th>
+<th align="left">stop|Palo Alto|604|3</th>
+<th align="left">stop|California Ave|649|3</th>
+<th align="left">stop|San Antonio|676|3</th>
+<th align="left">stop|Mountain View|702|3</th>
+<th align="left">stop|Sunnyvale|731|3</th>
+<th align="left">stop|Lawrence|757|4</th>
+<th align="left">stop|Santa Clara|805|4</th>
+<th align="left">stop|College Park|833|4</th>
+<th align="left">stop|San Jose|862|4</th>
+<th align="left">stop|Tamien|906|4</th>
+<th align="left">stop|Capitol|939|5</th>
+<th align="left">stop|Blossom Hill|966|5</th>
+<th align="left">stop|Morgan Hill|997|6</th>
+<th align="left">stop|San Martin|1021|6</th>
+<th align="left">stop|Gilroy|1053|6</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">04:55:00</td>
+<td align="left">5:00am</td>
+<td align="left">5:05am</td>
+<td align="left">5:11am</td>
+<td align="left">5:15am</td>
+<td align="left">5:19am</td>
+<td align="left">-</td>
+<td align="left">5:23am</td>
+<td align="left">5:26am</td>
+<td align="left">5:29am</td>
+<td align="left">5:32am</td>
+<td align="left">5:35am</td>
+<td align="left">5:38am</td>
+<td align="left">5:43am</td>
+<td align="left">-</td>
+<td align="left">5:48am</td>
+<td align="left">5:51am</td>
+<td align="left">5:55am</td>
+<td align="left">5:59am</td>
+<td align="left">6:03am</td>
+<td align="left">6:08am</td>
+<td align="left">6:12am</td>
+<td align="left">6:17am</td>
+<td align="left">-</td>
+<td align="left">06:26:00</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="even">
+<td align="right">104</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">05:25:00</td>
+<td align="left">5:30am</td>
+<td align="left">5:35am</td>
+<td align="left">5:41am</td>
+<td align="left">5:45am</td>
+<td align="left">5:49am</td>
+<td align="left">-</td>
+<td align="left">5:53am</td>
+<td align="left">5:56am</td>
+<td align="left">5:59am</td>
+<td align="left">6:02am</td>
+<td align="left">6:05am</td>
+<td align="left">6:08am</td>
+<td align="left">6:13am</td>
+<td align="left">-</td>
+<td align="left">6:18am</td>
+<td align="left">6:21am</td>
+<td align="left">6:25am</td>
+<td align="left">6:29am</td>
+<td align="left">6:33am</td>
+<td align="left">6:38am</td>
+<td align="left">6:42am</td>
+<td align="left">6:47am</td>
+<td align="left">-</td>
+<td align="left">06:56:00</td>
+<td align="left">7:03am</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="odd">
+<td align="right">206</td>
+<td align="left">L</td>
+<td align="left">S</td>
+<td align="left">06:11:00</td>
+<td align="left">6:16am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">6:29am</td>
+<td align="left">-</td>
+<td align="left">6:33am</td>
+<td align="left">6:36am</td>
+<td align="left">-</td>
+<td align="left">6:40am</td>
+<td align="left">-</td>
+<td align="left">6:44am</td>
+<td align="left">6:49am</td>
+<td align="left">-</td>
+<td align="left">6:54am</td>
+<td align="left">6:57am</td>
+<td align="left">7:01am</td>
+<td align="left">-</td>
+<td align="left">7:07am</td>
+<td align="left">-</td>
+<td align="left">7:12am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">07:24:00</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="even">
+<td align="right">208</td>
+<td align="left">L</td>
+<td align="left">S</td>
+<td align="left">06:24:00</td>
+<td align="left">6:29am</td>
+<td align="left">6:34am</td>
+<td align="left">6:40am</td>
+<td align="left">6:44am</td>
+<td align="left">6:48am</td>
+<td align="left">-</td>
+<td align="left">6:52am</td>
+<td align="left">6:55am</td>
+<td align="left">6:58am</td>
+<td align="left">7:01am</td>
+<td align="left">7:04am</td>
+<td align="left">i7:07am</td>
+<td align="left">i7:12am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:18am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:34am</td>
+<td align="left">-</td>
+<td align="left">07:43:00</td>
+<td align="left">7:50am</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="odd">
+<td align="right">210</td>
+<td align="left">L</td>
+<td align="left">S</td>
+<td align="left">06:44:00</td>
+<td align="left">6:49am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:01am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:07am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">i7:13am</td>
+<td align="left">i7:18am</td>
+<td align="left">-</td>
+<td align="left">7:23am</td>
+<td align="left">7:26am</td>
+<td align="left">7:30am</td>
+<td align="left">7:34am</td>
+<td align="left">7:38am</td>
+<td align="left">7:43am</td>
+<td align="left">7:49am</td>
+<td align="left">7:56am</td>
+<td align="left">7:59am</td>
+<td align="left">08:06:00</td>
+<td align="left">8:13am</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="even">
+<td align="right">312</td>
+<td align="left">B</td>
+<td align="left">S</td>
+<td align="left">06:59:00</td>
+<td align="left">7:04am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:17am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:30am</td>
+<td align="left">-</td>
+<td align="left">7:35am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:44am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">07:58:00</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+</tbody>
+</table>
+<p>What am I looking at? SF, South SF, Millbrae, Burlingame, San Mateo, MPK, Palo Alto. The nightmare of the 101 commute is on my computer screen again. This is the train schedule for the Bay Area instead of Paris -&gt; Lyon. That’s gross and dissapointing.</p>
+<p>Anyway, how many rows are in this table?</p>
+<pre class="r"><code>nrow(td)</code></pre>
+<pre><code>## [1] 122</code></pre>
+<p>Let’s change the column names so they’re a bit easier to work with.</p>
+<pre class="r"><code>colnames(td) &lt;- c(&quot;number&quot;, &quot;type&quot;, &quot;direction&quot;, &quot;san_francisco&quot;, &quot;twentysecond_street&quot;, 
+    &quot;bayshore&quot;, &quot;so_san_francisco&quot;, &quot;san_bruno&quot;, &quot;millbrae&quot;, &quot;broadway&quot;, &quot;burlingame&quot;, 
+    &quot;san_mateo&quot;, &quot;hayward_park&quot;, &quot;hillsdale&quot;, &quot;belmont&quot;, &quot;san_carlos&quot;, &quot;redwood_city&quot;, 
+    &quot;atherton&quot;, &quot;menlo_park&quot;, &quot;palo_alto&quot;, &quot;california_ave&quot;, &quot;san_antonio&quot;, 
+    &quot;mountainview&quot;, &quot;sunnyvale&quot;, &quot;lawrence&quot;, &quot;santaclara&quot;, &quot;college_park&quot;, &quot;san_jose&quot;, 
+    &quot;tamien&quot;, &quot;capitol&quot;, &quot;blossom_hill&quot;, &quot;morgan_hill&quot;, &quot;san_martin&quot;, &quot;gilroy&quot;)
+
+kable(head(td))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">number</th>
+<th align="left">type</th>
+<th align="left">direction</th>
+<th align="left">san_francisco</th>
+<th align="left">twentysecond_street</th>
+<th align="left">bayshore</th>
+<th align="left">so_san_francisco</th>
+<th align="left">san_bruno</th>
+<th align="left">millbrae</th>
+<th align="left">broadway</th>
+<th align="left">burlingame</th>
+<th align="left">san_mateo</th>
+<th align="left">hayward_park</th>
+<th align="left">hillsdale</th>
+<th align="left">belmont</th>
+<th align="left">san_carlos</th>
+<th align="left">redwood_city</th>
+<th align="left">atherton</th>
+<th align="left">menlo_park</th>
+<th align="left">palo_alto</th>
+<th align="left">california_ave</th>
+<th align="left">san_antonio</th>
+<th align="left">mountainview</th>
+<th align="left">sunnyvale</th>
+<th align="left">lawrence</th>
+<th align="left">santaclara</th>
+<th align="left">college_park</th>
+<th align="left">san_jose</th>
+<th align="left">tamien</th>
+<th align="left">capitol</th>
+<th align="left">blossom_hill</th>
+<th align="left">morgan_hill</th>
+<th align="left">san_martin</th>
+<th align="left">gilroy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">04:55:00</td>
+<td align="left">5:00am</td>
+<td align="left">5:05am</td>
+<td align="left">5:11am</td>
+<td align="left">5:15am</td>
+<td align="left">5:19am</td>
+<td align="left">-</td>
+<td align="left">5:23am</td>
+<td align="left">5:26am</td>
+<td align="left">5:29am</td>
+<td align="left">5:32am</td>
+<td align="left">5:35am</td>
+<td align="left">5:38am</td>
+<td align="left">5:43am</td>
+<td align="left">-</td>
+<td align="left">5:48am</td>
+<td align="left">5:51am</td>
+<td align="left">5:55am</td>
+<td align="left">5:59am</td>
+<td align="left">6:03am</td>
+<td align="left">6:08am</td>
+<td align="left">6:12am</td>
+<td align="left">6:17am</td>
+<td align="left">-</td>
+<td align="left">06:26:00</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="even">
+<td align="right">104</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">05:25:00</td>
+<td align="left">5:30am</td>
+<td align="left">5:35am</td>
+<td align="left">5:41am</td>
+<td align="left">5:45am</td>
+<td align="left">5:49am</td>
+<td align="left">-</td>
+<td align="left">5:53am</td>
+<td align="left">5:56am</td>
+<td align="left">5:59am</td>
+<td align="left">6:02am</td>
+<td align="left">6:05am</td>
+<td align="left">6:08am</td>
+<td align="left">6:13am</td>
+<td align="left">-</td>
+<td align="left">6:18am</td>
+<td align="left">6:21am</td>
+<td align="left">6:25am</td>
+<td align="left">6:29am</td>
+<td align="left">6:33am</td>
+<td align="left">6:38am</td>
+<td align="left">6:42am</td>
+<td align="left">6:47am</td>
+<td align="left">-</td>
+<td align="left">06:56:00</td>
+<td align="left">7:03am</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="odd">
+<td align="right">206</td>
+<td align="left">L</td>
+<td align="left">S</td>
+<td align="left">06:11:00</td>
+<td align="left">6:16am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">6:29am</td>
+<td align="left">-</td>
+<td align="left">6:33am</td>
+<td align="left">6:36am</td>
+<td align="left">-</td>
+<td align="left">6:40am</td>
+<td align="left">-</td>
+<td align="left">6:44am</td>
+<td align="left">6:49am</td>
+<td align="left">-</td>
+<td align="left">6:54am</td>
+<td align="left">6:57am</td>
+<td align="left">7:01am</td>
+<td align="left">-</td>
+<td align="left">7:07am</td>
+<td align="left">-</td>
+<td align="left">7:12am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">07:24:00</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="even">
+<td align="right">208</td>
+<td align="left">L</td>
+<td align="left">S</td>
+<td align="left">06:24:00</td>
+<td align="left">6:29am</td>
+<td align="left">6:34am</td>
+<td align="left">6:40am</td>
+<td align="left">6:44am</td>
+<td align="left">6:48am</td>
+<td align="left">-</td>
+<td align="left">6:52am</td>
+<td align="left">6:55am</td>
+<td align="left">6:58am</td>
+<td align="left">7:01am</td>
+<td align="left">7:04am</td>
+<td align="left">i7:07am</td>
+<td align="left">i7:12am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:18am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:34am</td>
+<td align="left">-</td>
+<td align="left">07:43:00</td>
+<td align="left">7:50am</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="odd">
+<td align="right">210</td>
+<td align="left">L</td>
+<td align="left">S</td>
+<td align="left">06:44:00</td>
+<td align="left">6:49am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:01am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:07am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">i7:13am</td>
+<td align="left">i7:18am</td>
+<td align="left">-</td>
+<td align="left">7:23am</td>
+<td align="left">7:26am</td>
+<td align="left">7:30am</td>
+<td align="left">7:34am</td>
+<td align="left">7:38am</td>
+<td align="left">7:43am</td>
+<td align="left">7:49am</td>
+<td align="left">7:56am</td>
+<td align="left">7:59am</td>
+<td align="left">08:06:00</td>
+<td align="left">8:13am</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+<tr class="even">
+<td align="right">312</td>
+<td align="left">B</td>
+<td align="left">S</td>
+<td align="left">06:59:00</td>
+<td align="left">7:04am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:17am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:30am</td>
+<td align="left">-</td>
+<td align="left">7:35am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">7:44am</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">07:58:00</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+<td align="left">X</td>
+</tr>
+</tbody>
+</table>
+<p>So what do we notice about our data?</p>
+<ol style="list-style-type: decimal">
+<li><p>The <code>number</code> field looks like a train number. We’ll make a unique line for each <code>number</code> in our visualization.</p></li>
+<li><p>San Francisco and San Jose are the start and stop points. They also have different time formats than the other fields. We should probably coerce all timestamps to the same format just for simplification purposes.</p></li>
+<li><p>Direction indicates whether the train is moving from SF -&gt; San Jose or vice-versa.</p></li>
+</ol>
+<p>Let’s start by coercing the the different timestamps to the same timestamp format. For this we’ll use the <code>lubridate::parse_date_time()</code> function.</p>
+<p>The timestamps for the intermediate stations are in the format <code>%I:%M%p</code> e.g. <code>7:04am</code>.</p>
+<p>Calling this function will yield: 0000-01-01 07:04:00</p>
+<p>The SF and San Jose columns are in the more straightforward <code>%H:%M:%s</code> format.</p>
+<p>First, we’ll convert all time columns to a character.</p>
+<pre class="r"><code>td %&lt;&gt;% mutate(san_francisco = as.character(san_francisco), san_jose = as.character(san_jose))
+
+glimpse(td)</code></pre>
+<pre><code>## Observations: 122
+## Variables: 34
+## $ number              &lt;int&gt; 102, 104, 206, 208, 210, 312, 314, 216, 21...
+## $ type                &lt;chr&gt; &quot;N&quot;, &quot;N&quot;, &quot;L&quot;, &quot;L&quot;, &quot;L&quot;, &quot;B&quot;, &quot;B&quot;, &quot;L&quot;, &quot;L...
+## $ direction           &lt;chr&gt; &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S...
+## $ san_francisco       &lt;chr&gt; &quot;04:55:00&quot;, &quot;05:25:00&quot;, &quot;06:11:00&quot;, &quot;06:24...
+## $ twentysecond_street &lt;chr&gt; &quot;5:00am&quot;, &quot;5:30am&quot;, &quot;6:16am&quot;, &quot;6:29am&quot;, &quot;6...
+## $ bayshore            &lt;chr&gt; &quot;5:05am&quot;, &quot;5:35am&quot;, &quot;-&quot;, &quot;6:34am&quot;, &quot;-&quot;, &quot;-...
+## $ so_san_francisco    &lt;chr&gt; &quot;5:11am&quot;, &quot;5:41am&quot;, &quot;-&quot;, &quot;6:40am&quot;, &quot;-&quot;, &quot;-...
+## $ san_bruno           &lt;chr&gt; &quot;5:15am&quot;, &quot;5:45am&quot;, &quot;-&quot;, &quot;6:44am&quot;, &quot;-&quot;, &quot;-...
+## $ millbrae            &lt;chr&gt; &quot;5:19am&quot;, &quot;5:49am&quot;, &quot;6:29am&quot;, &quot;6:48am&quot;, &quot;7...
+## $ broadway            &lt;chr&gt; &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-...
+## $ burlingame          &lt;chr&gt; &quot;5:23am&quot;, &quot;5:53am&quot;, &quot;6:33am&quot;, &quot;6:52am&quot;, &quot;-...
+## $ san_mateo           &lt;chr&gt; &quot;5:26am&quot;, &quot;5:56am&quot;, &quot;6:36am&quot;, &quot;6:55am&quot;, &quot;7...
+## $ hayward_park        &lt;chr&gt; &quot;5:29am&quot;, &quot;5:59am&quot;, &quot;-&quot;, &quot;6:58am&quot;, &quot;-&quot;, &quot;-...
+## $ hillsdale           &lt;chr&gt; &quot;5:32am&quot;, &quot;6:02am&quot;, &quot;6:40am&quot;, &quot;7:01am&quot;, &quot;-...
+## $ belmont             &lt;chr&gt; &quot;5:35am&quot;, &quot;6:05am&quot;, &quot;-&quot;, &quot;7:04am&quot;, &quot;-&quot;, &quot;-...
+## $ san_carlos          &lt;chr&gt; &quot;5:38am&quot;, &quot;6:08am&quot;, &quot;6:44am&quot;, &quot;i7:07am&quot;, &quot;...
+## $ redwood_city        &lt;chr&gt; &quot;5:43am&quot;, &quot;6:13am&quot;, &quot;6:49am&quot;, &quot;i7:12am&quot;, &quot;...
+## $ atherton            &lt;chr&gt; &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-...
+## $ menlo_park          &lt;chr&gt; &quot;5:48am&quot;, &quot;6:18am&quot;, &quot;6:54am&quot;, &quot;-&quot;, &quot;7:23am...
+## $ palo_alto           &lt;chr&gt; &quot;5:51am&quot;, &quot;6:21am&quot;, &quot;6:57am&quot;, &quot;7:18am&quot;, &quot;7...
+## $ california_ave      &lt;chr&gt; &quot;5:55am&quot;, &quot;6:25am&quot;, &quot;7:01am&quot;, &quot;-&quot;, &quot;7:30am...
+## $ san_antonio         &lt;chr&gt; &quot;5:59am&quot;, &quot;6:29am&quot;, &quot;-&quot;, &quot;-&quot;, &quot;7:34am&quot;, &quot;-...
+## $ mountainview        &lt;chr&gt; &quot;6:03am&quot;, &quot;6:33am&quot;, &quot;7:07am&quot;, &quot;-&quot;, &quot;7:38am...
+## $ sunnyvale           &lt;chr&gt; &quot;6:08am&quot;, &quot;6:38am&quot;, &quot;-&quot;, &quot;-&quot;, &quot;7:43am&quot;, &quot;-...
+## $ lawrence            &lt;chr&gt; &quot;6:12am&quot;, &quot;6:42am&quot;, &quot;7:12am&quot;, &quot;-&quot;, &quot;7:49am...
+## $ santaclara          &lt;chr&gt; &quot;6:17am&quot;, &quot;6:47am&quot;, &quot;-&quot;, &quot;7:34am&quot;, &quot;7:56am...
+## $ college_park        &lt;chr&gt; &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;7:59am&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-...
+## $ san_jose            &lt;chr&gt; &quot;06:26:00&quot;, &quot;06:56:00&quot;, &quot;07:24:00&quot;, &quot;07:43...
+## $ tamien              &lt;chr&gt; &quot;X&quot;, &quot;7:03am&quot;, &quot;X&quot;, &quot;7:50am&quot;, &quot;8:13am&quot;, &quot;X...
+## $ capitol             &lt;chr&gt; &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X...
+## $ blossom_hill        &lt;chr&gt; &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X...
+## $ morgan_hill         &lt;chr&gt; &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X...
+## $ san_martin          &lt;chr&gt; &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X...
+## $ gilroy              &lt;chr&gt; &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X...</code></pre>
+<div id="visualizing" class="section level1">
+<h1>Visualizing</h1>
+<p>So the data should be in a rough enough format to start visualizing. Let’s do it.</p>
+<p>First, let’s gather everything up so it’s easier to facet / group by station. For this we’ll use <code>tidyr::gather()</code></p>
+<pre class="r"><code>td_g &lt;- td %&gt;% gather(key = &quot;station&quot;, value = &quot;time&quot;, 4:ncol(td), convert = FALSE, 
+    factor_key = TRUE)
+
+# Now let&#39;s convert all the times to actual time formats R understands
+td_g %&lt;&gt;% mutate(time = parse_time(time))
+
+glimpse(td_g)</code></pre>
+<pre><code>## Observations: 3,782
+## Variables: 5
+## $ number    &lt;int&gt; 102, 104, 206, 208, 210, 312, 314, 216, 218, 220, 32...
+## $ type      &lt;chr&gt; &quot;N&quot;, &quot;N&quot;, &quot;L&quot;, &quot;L&quot;, &quot;L&quot;, &quot;B&quot;, &quot;B&quot;, &quot;L&quot;, &quot;L&quot;, &quot;L&quot;, &quot;B...
+## $ direction &lt;chr&gt; &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S...
+## $ station   &lt;fctr&gt; san_francisco, san_francisco, san_francisco, san_fr...
+## $ time      &lt;time&gt; 04:55:00, 05:25:00, 06:11:00, 06:24:00, 06:44:00, 0...</code></pre>
+<p>Just as a sanity check, we should have a bunch of new rows per train</p>
+<pre class="r"><code>kable(td_g %&gt;% filter(number == 102) %&gt;% head())</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">number</th>
+<th align="left">type</th>
+<th align="left">direction</th>
+<th align="left">station</th>
+<th align="left">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">san_francisco</td>
+<td align="left">04:55:00</td>
+</tr>
+<tr class="even">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">twentysecond_street</td>
+<td align="left">05:00:00</td>
+</tr>
+<tr class="odd">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">bayshore</td>
+<td align="left">05:05:00</td>
+</tr>
+<tr class="even">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">so_san_francisco</td>
+<td align="left">05:11:00</td>
+</tr>
+<tr class="odd">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">san_bruno</td>
+<td align="left">05:15:00</td>
+</tr>
+<tr class="even">
+<td align="right">102</td>
+<td align="left">N</td>
+<td align="left">S</td>
+<td align="left">millbrae</td>
+<td align="left">05:19:00</td>
+</tr>
+</tbody>
+</table>
+<p>The order of the stations is important. Let’s factor the station field and set the levels to the correct order. The train number should also be a factor.</p>
+<pre class="r"><code>td_g %&lt;&gt;% mutate(station = factor(station, levels = c(&quot;san_francisco&quot;, &quot;twentysecond_street&quot;, 
+    &quot;bayshore&quot;, &quot;so_san_francisco&quot;, &quot;san_bruno&quot;, &quot;millbrae&quot;, &quot;broadway&quot;, &quot;burlingame&quot;, 
+    &quot;san_mateo&quot;, &quot;hayward_park&quot;, &quot;hillsdale&quot;, &quot;belmont&quot;, &quot;san_carlos&quot;, &quot;redwood_city&quot;, 
+    &quot;atherton&quot;, &quot;menlo_park&quot;, &quot;palo_alto&quot;, &quot;california_ave&quot;, &quot;san_antonio&quot;, 
+    &quot;mountainview&quot;, &quot;sunnyvale&quot;, &quot;lawrence&quot;, &quot;santaclara&quot;, &quot;college_park&quot;, &quot;san_jose&quot;, 
+    &quot;tamien&quot;, &quot;capitol&quot;, &quot;blossom_hill&quot;, &quot;morgan_hill&quot;, &quot;san_martin&quot;, &quot;gilroy&quot;)), 
+    number = as.factor(number), direction = as.factor(direction))</code></pre>
+<p>So the structure of the plot is:</p>
+<ul>
+<li>Time is represented across the x-axis</li>
+<li>The y-axis is each station</li>
+<li>Each Train will be an individual line</li>
+</ul>
+<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them 😞</p>
+<p>Good thing we made a backup of the data in its raw imported form.</p>
+<pre class="r"><code>cities &lt;- unique(td_g$station)
+
+distance &lt;- c(0, 40, 124, 178, 216, 249, 280, 307, 334, 354, 391, 428, 458, 
+    499, 543, 574, 604, 649, 676, 702, 731, 757, 805, 833, 862, 906, 939, 966, 
+    997, 1021, 1053)
+
+city_distances &lt;- data.frame(cities = cities, distance = distance)
+
+kable(head(city_distances))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">cities</th>
+<th align="right">distance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">san_francisco</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">twentysecond_street</td>
+<td align="right">40</td>
+</tr>
+<tr class="odd">
+<td align="left">bayshore</td>
+<td align="right">124</td>
+</tr>
+<tr class="even">
+<td align="left">so_san_francisco</td>
+<td align="right">178</td>
+</tr>
+<tr class="odd">
+<td align="left">san_bruno</td>
+<td align="right">216</td>
+</tr>
+<tr class="even">
+<td align="left">millbrae</td>
+<td align="right">249</td>
+</tr>
+</tbody>
+</table>
+<p>Then let’s join that in to our <code>td_g</code> table.</p>
+<pre class="r"><code>td_g %&lt;&gt;% inner_join(city_distances, by = c(station = &quot;cities&quot;))</code></pre>
+<p>And finally, this should give us something close:</p>
+<pre class="r"><code>ggplot(td_g %&gt;% filter(number != &quot;451&quot;, number != &quot;450&quot;, number != &quot;197&quot;, number != 
+    &quot;196&quot;), aes(x = time, y = -distance, group = number, color = direction)) + 
+    geom_line(size = 0.25) + theme_minimal() + theme(legend.position = &quot;top&quot;, 
+    axis.title = element_blank()) + scale_y_continuous(labels = unique(td_g$station), 
+    breaks = unique(-td_g$distance)) + scale_color_viridis(discrete = T, direction = -1, 
+    option = &quot;B&quot;, end = 0.7)</code></pre>
+<p><img src="/post/2017-10-01-the-train-schedule_files/figure-html/plot_try_one-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>To make this easier to look at let’s filter to just between 6am and noon.</p>
+<pre class="r"><code>plot_df &lt;- td_g %&gt;% filter(time &gt;= parse_time(&quot;06:00:00&quot;), time &lt;= parse_time(&quot;12:00:00&quot;))
+
+ggplot(plot_df, aes(x = time, y = -distance, group = number)) + geom_line(size = 0.25, 
+    aes(color = direction)) + theme_minimal() + theme(legend.position = &quot;none&quot;, 
+    axis.title = element_blank(), panel.grid.minor = element_blank()) + scale_y_continuous(labels = cities, 
+    breaks = -distance) + scale_colour_viridis(discrete = T, direction = -1, 
+    option = &quot;B&quot;, end = 0.7)</code></pre>
+<p><img src="/post/2017-10-01-the-train-schedule_files/figure-html/filtered_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>That’s it 😃</p>
+</div>

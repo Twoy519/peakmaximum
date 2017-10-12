@@ -2,7 +2,7 @@ baseurl = "/"
 languageCode = "en-us"
 title = "Maximuming At The Peak"
 theme = "hugo-theme-cactus-plus"
-googleAnalytics = ""
+googleAnalytics = "UA-108019207-1"
 disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
@@ -20,6 +20,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     url = "https://twitter.com/_T_R_O_Y"
 
 [params]
+	  enableGoogleAnalytics = true
     description = "A website built through Hugo and blogdown."
 
     # options for highlight.js (version, additional languages, and theme)

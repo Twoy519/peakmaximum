@@ -1,0 +1,192 @@
+---
+title: Plot Grouped Indexed Time-Series Changes
+author: ~
+date: '2017-12-05'
+slug: indexed-time-series-changes
+categories: ['Data Visualization','R']
+tags: ['R','DataViz']
+keywords: ['R','dataviz']
+description: 'Contextualizing Time-Series Changes When Absolute Values are Magnitudes Different'
+---
+
+
+
+<p><img src="/img/giant_footballers.png" width="300px" style="display: block; margin: auto;" /></p>
+<h1>
+COPY / PASTE HERE:
+</h1>
+<blockquote>
+<p>mutate( index = value / value[1] - 1 )</p>
+</blockquote>
+<p>For this example, we need a dataset which is a time-series with at least two grouping factors.</p>
+<p>Let’s get wikipedia page visits for a few footballers using the <code>pageviews</code> package</p>
+<pre class="r"><code>library( pageviews)
+
+trend_data &lt;- 
+  article_pageviews(
+    project = &quot;en.wikipedia&quot;,
+    article = c(
+      &#39;Luis_Suárez&#39;
+      , &#39;Lionel_Messi&#39;
+      , &#39;Neymar&#39;
+      , &#39;Christian_Pulisic&#39;
+      , &#39;Harry_Kane&#39;
+      , &#39;Mohamed_Salah&#39;
+      , &#39;Philippe_Coutinho&#39;
+      , &#39;Roberto_Firmino&#39;
+      , &#39;Jordan_Henderson&#39;
+    ),
+    start = &quot;2016010100&quot;,
+    end=&quot;2017010100&quot;
+  )
+
+library( magrittr)
+
+trend_data %&lt;&gt;%
+  mutate(
+    date = as.Date( date)
+    , article = as.factor( article)
+  ) %&gt;% 
+  select(date, article, views)
+
+library( dplyr)
+library( scales)
+
+glimpse( trend_data)</code></pre>
+<pre><code>## Observations: 3,281
+## Variables: 3
+## $ date    &lt;date&gt; 2016-01-01, 2016-01-02, 2016-01-03, 2016-01-04, 2016-...
+## $ article &lt;fctr&gt; Luis_Suárez, Luis_Suárez, Luis_Suárez, Luis_Suárez, L...
+## $ views   &lt;dbl&gt; 6809, 8033, 6251, 6378, 6427, 6277, 6580, 6349, 7734, ...</code></pre>
+<pre class="r"><code>trend_data %&gt;%
+  group_by( article) %&gt;% 
+  summarise( pageviews = sum(views, na.rm=T)) %&gt;% 
+  arrange(-pageviews) %&gt;%
+  mutate( pageviews = scales::comma(pageviews))</code></pre>
+<pre><code>## # A tibble: 9 x 2
+##             article  pageviews
+##              &lt;fctr&gt;      &lt;chr&gt;
+## 1      Lionel_Messi 12,323,125
+## 2            Neymar  4,214,055
+## 3       Luis_Suárez  2,564,810
+## 4        Harry_Kane  1,709,017
+## 5 Christian_Pulisic  1,295,802
+## 6 Philippe_Coutinho  1,001,555
+## 7   Roberto_Firmino    869,566
+## 8     Mohamed_Salah    507,699
+## 9  Jordan_Henderson    500,496</code></pre>
+<p>So we see that we have a time series with grouping variables that are magnitudes different in scale due to the varying popularities of the footballer. The problem this poses is that looking at a time-series trend is hard to parse for changes.</p>
+<pre class="r"><code>library( ggplot2)
+
+ggplot(
+  trend_data
+  ,aes(
+    x = date
+    , y = views
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette=&#39;Set1&#39;) +
+  labs(title = &#39;Wikipedia Pageviews of EPL footballers since Jan 2016&#39;) +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels=scales::comma)</code></pre>
+<p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>There are a couple methods of dealing with this.</p>
+<ol style="list-style-type: decimal">
+<li><p>change the scale on the y-axis to a log-transformed scale.</p></li>
+<li><p>Normalize the values by showing percent change instead of absolute values.</p></li>
+</ol>
+<pre class="r"><code>ggplot(
+  trend_data
+  ,aes(
+    x = date
+    , y = views
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette=&#39;Set1&#39;) +
+  labs(
+    title = &#39;Wikipedia Pageviews of EPL footballers since Jan 2016&#39;
+    , subtitle = &#39;Log-scaled y-axis&#39;
+  ) +
+  theme(axis.title = element_blank()) +
+  scale_y_log10(labels=scales::comma, breaks = c(1e2,1e3,1e4,1e5,1e6))</code></pre>
+<p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This doesn’t <em>really</em> help that much. Let’s pick a focused time period, and show a percentage change. I’m interested in seeing if Jordan Henderson got an uptick in September 2016 after his f*cking stunner:</p>
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=iK88-Z4KCro" frameborder="0" allowfullscreen>
+</iframe>
+<pre class="r"><code>ggplot(
+  trend_data %&gt;%
+    filter( date &gt;= &#39;2016-09-01&#39;, date &lt; &#39;2016-10-01&#39;)
+  ,aes(
+    x = date
+    , y = views
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette=&#39;Set1&#39;) +
+  labs(
+    title = &#39;Wikipedia Pageviews of EPL footballers since Jan 2016&#39;
+    , subtitle = &#39;Log-scaled y-axis&#39;
+  ) +
+  theme(axis.title = element_blank(), panel.background = element_rect(fill=&#39;#E0E0E0&#39;)) +
+  scale_y_log10(labels=scales::comma, breaks = c(1e2,1e3,1e4,1e5,1e6))</code></pre>
+<p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Sure did. This is <strong>OK</strong>, but Jordan’s line doesn’t really stand out. Here’s where the indexing comes in. Let’s show percent change instead of absolute values.</p>
+<pre class="r"><code>ggplot(
+  trend_data %&gt;%
+    filter( date &gt;= &#39;2016-09-01&#39;, date &lt; &#39;2016-10-01&#39;) %&gt;% 
+    group_by(article) %&gt;% 
+    arrange(date) %&gt;% 
+    mutate(index = views / views[1] - 1)
+  ,aes(
+    x = date
+    , y = index
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette=&#39;Set1&#39;) +
+  labs(
+    title = &#39;Wikipedia Pageviews of EPL footballers since Jan 2016&#39;
+    , subtitle = &#39;Log-scaled y-axis&#39;
+  ) +
+  theme(axis.title = element_blank(), panel.background = element_rect(fill=&#39;#E0E0E0&#39;)) +
+  scale_y_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>We can see Jordan Henderson’s wonderstrike sending him skyrocketing up. Stupid Cristian Pulisic <a href='http://www.espn.co.uk/football/united-states/story/2945346/christian-pulisic-was-wonderful-in-united-states-win-jurgen-klinsmann?src=com' target='_blank'>ruins it a bit</a>.</p>
+<p>Let’s smooth these curves out with a 3-day average using <code>zoo</code>’s rollmean function.</p>
+<pre class="r"><code>library( zoo)
+
+ggplot(
+  trend_data %&gt;%
+    filter( date &gt;= &#39;2016-09-01&#39;, date &lt; &#39;2016-10-01&#39;) %&gt;% 
+    group_by(article) %&gt;% 
+    arrange(date) %&gt;% 
+    mutate(
+      index = views / views[1] - 1
+      , index_mean_3d = rollmean(index, k = 3, align=&#39;right&#39;, fill = NA)
+      )
+  ,aes(
+    x = date
+    , y = index_mean_3d
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette=&#39;Set1&#39;) +
+  labs(
+    title = &#39;Wikipedia Pageviews of EPL footballers since Jan 2016&#39;
+    , subtitle = &#39;Log-scaled y-axis&#39;
+  ) +
+  theme(axis.title = element_blank(), panel.background = element_rect(fill=&#39;#E0E0E0&#39;)) +
+  scale_y_continuous( labels=scales::percent)</code></pre>
+<p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>

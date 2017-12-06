@@ -6,10 +6,22 @@
     <description>Recent content in Posts on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Oct 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 05 Dec 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Plot Grouped Indexed Time-Series Changes</title>
+      <link>/2017/12/05/indexed-time-series-changes/</link>
+      <pubDate>Tue, 05 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/12/05/indexed-time-series-changes/</guid>
+      <description>COPY / PASTE HERE:   mutate( index = value / value[1] - 1 )
+ For this example, we need a dataset which is a time-series with at least two grouping factors.
+Let’s get wikipedia page visits for a few footballers using the pageviews package
+library( pageviews) trend_data &amp;lt;- article_pageviews( project = &amp;quot;en.wikipedia&amp;quot;, article = c( &amp;#39;Luis_Suárez&amp;#39; , &amp;#39;Lionel_Messi&amp;#39; , &amp;#39;Neymar&amp;#39; , &amp;#39;Christian_Pulisic&amp;#39; , &amp;#39;Harry_Kane&amp;#39; , &amp;#39;Mohamed_Salah&amp;#39; , &amp;#39;Philippe_Coutinho&amp;#39; , &amp;#39;Roberto_Firmino&amp;#39; , &amp;#39;Jordan_Henderson&amp;#39; ), start = &amp;quot;2016010100&amp;quot;, end=&amp;quot;2017010100&amp;quot; ) library( magrittr) trend_data %&amp;lt;&amp;gt;% mutate( date = as.</description>
+    </item>
     
     <item>
       <title>The Train Schedule</title>

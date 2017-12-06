@@ -1,0 +1,234 @@
+---
+title: Plot Grouped Indexed Time-Series Changes
+author: ~
+date: '2017-12-05'
+slug: indexed-time-series-changes
+categories: ['Data Visualization','R']
+tags: ['R','DataViz']
+keywords: ['R','dataviz']
+description: 'Contextualizing Time-Series Changes When Absolute Values are Magnitudes Different'
+---
+
+```{r global_options, include=FALSE}
+
+knitr::opts_chunk$set(
+    fig.align = 'center'
+    , message = FALSE
+    , warning = FALSE
+    , error = FALSE
+    , cache = TRUE
+  )
+
+```
+
+
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/giant_footballers.png")
+
+```
+
+<h1>COPY / PASTE HERE: </h1>
+
+> mutate( index = value / value[1] - 1 )
+
+For this example, we need a dataset which is a time-series with at least two grouping factors.  
+
+Let's get wikipedia page visits for a few footballers using the `pageviews` package
+
+```{r}
+
+library( pageviews)
+
+trend_data <- 
+  article_pageviews(
+    project = "en.wikipedia",
+    article = c(
+      'Luis_Suárez'
+      , 'Lionel_Messi'
+      , 'Neymar'
+      , 'Christian_Pulisic'
+      , 'Harry_Kane'
+      , 'Mohamed_Salah'
+      , 'Philippe_Coutinho'
+      , 'Roberto_Firmino'
+      , 'Jordan_Henderson'
+    ),
+    start = "2016010100",
+    end="2017010100"
+  )
+
+library( magrittr)
+
+trend_data %<>%
+  mutate(
+    date = as.Date( date)
+    , article = as.factor( article)
+  ) %>% 
+  select(date, article, views)
+
+library( dplyr)
+library( scales)
+
+glimpse( trend_data)
+
+trend_data %>%
+  group_by( article) %>% 
+  summarise( pageviews = sum(views, na.rm=T)) %>% 
+  arrange(-pageviews) %>%
+  mutate( pageviews = scales::comma(pageviews))
+
+```
+
+So we see that we have a time series with grouping variables that are magnitudes different in scale due to the varying popularities of the footballer. The problem this poses is that looking at a time-series trend is hard to parse for changes.
+
+```{r}
+
+library( ggplot2)
+
+ggplot(
+  trend_data
+  ,aes(
+    x = date
+    , y = views
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette='Set1') +
+  labs(title = 'Wikipedia Pageviews of EPL footballers since Jan 2016') +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels=scales::comma)
+
+```
+
+There are a couple methods of dealing with this.
+
+1. change the scale on the y-axis to a log-transformed scale.
+
+2. Normalize the values by showing percent change instead of absolute values.
+
+
+```{r}
+
+ggplot(
+  trend_data
+  ,aes(
+    x = date
+    , y = views
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette='Set1') +
+  labs(
+    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    , subtitle = 'Log-scaled y-axis'
+  ) +
+  theme(axis.title = element_blank()) +
+  scale_y_log10(labels=scales::comma, breaks = c(1e2,1e3,1e4,1e5,1e6))
+
+```
+
+This doesn't *really* help that much. Let's pick a focused time period, and show a percentage change. I'm interested in seeing if Jordan Henderson got an uptick in September 2016 after his f*cking stunner:
+
+<iframe width='560' height='315' src='https://www.youtube.com/watch?v=iK88-Z4KCro' frameborder='0' allowfullscreen></iframe>
+
+
+```{r}
+
+ggplot(
+  trend_data %>%
+    filter( date >= '2016-09-01', date < '2016-10-01')
+  ,aes(
+    x = date
+    , y = views
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette='Set1') +
+  labs(
+    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    , subtitle = 'Log-scaled y-axis'
+  ) +
+  theme(axis.title = element_blank(), panel.background = element_rect(fill='#E0E0E0')) +
+  scale_y_log10(labels=scales::comma, breaks = c(1e2,1e3,1e4,1e5,1e6))
+
+```
+
+Sure did. This is **OK**, but Jordan's line doesn't really stand out. Here's where the indexing comes in. Let's show percent change instead of absolute values.
+
+```{r}
+
+ggplot(
+  trend_data %>%
+    filter( date >= '2016-09-01', date < '2016-10-01') %>% 
+    group_by(article) %>% 
+    arrange(date) %>% 
+    mutate(index = views / views[1] - 1)
+  ,aes(
+    x = date
+    , y = index
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette='Set1') +
+  labs(
+    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    , subtitle = 'Log-scaled y-axis'
+  ) +
+  theme(axis.title = element_blank(), panel.background = element_rect(fill='#E0E0E0')) +
+  scale_y_continuous(labels=scales::percent)
+
+```
+
+We can see Jordan Henderson's wonderstrike sending him skyrocketing up. Stupid Cristian Pulisic <a href='http://www.espn.co.uk/football/united-states/story/2945346/christian-pulisic-was-wonderful-in-united-states-win-jurgen-klinsmann?src=com' target='_blank'>ruins it a bit</a>.
+
+Let's smooth these curves out with a 3-day average using `zoo`'s rollmean function.
+
+```{r}
+
+library( zoo)
+
+ggplot(
+  trend_data %>%
+    filter( date >= '2016-09-01', date < '2016-10-01') %>% 
+    group_by(article) %>% 
+    arrange(date) %>% 
+    mutate(
+      index = views / views[1] - 1
+      , index_mean_3d = rollmean(index, k = 3, align='right', fill = NA)
+      )
+  ,aes(
+    x = date
+    , y = index_mean_3d
+    , color = article
+  )
+) +
+  geom_line() +
+  theme_bw() +
+  scale_color_brewer(palette='Set1') +
+  labs(
+    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    , subtitle = 'Log-scaled y-axis'
+  ) +
+  theme(axis.title = element_blank(), panel.background = element_rect(fill='#E0E0E0')) +
+  scale_y_continuous( labels=scales::percent)
+
+```
+
+
+
+
+
+
+
+
+
+

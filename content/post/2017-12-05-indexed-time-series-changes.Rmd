@@ -32,6 +32,12 @@ knitr::include_graphics("/img/giant_footballers.png")
 
 > mutate( index = value / value[1] - 1 )
 
+One thing I do at my job **all. the. time** is index time-series together in order to compare relative changes in a given time window. The problem statement is usually when I'm comparing the price changes of two assets with vastly different prices. So trying to plot something moving from $1MM to $1.1MM on the same plot as something moving from $10 to $11.
+
+There are other methods of doing this. Most notably for me is [Len Kiefer's sweet animation moving the index point through time](http://lenkiefer.com/2017/05/23/index-start/). Making the gifs is a bit much for 99% of real-world use-cases though so I'll skip that.
+
+I wrote this post though mainly as a note to myself so I won't have to re-google it until I've fully commited it to memory.
+
 For this example, we need a dataset which is a time-series with at least two grouping factors.  
 
 Let's get wikipedia page visits for a few footballers using the `pageviews` package

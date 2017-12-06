@@ -132,9 +132,22 @@ ggplot(
 
 ```
 
-This doesn't *really* help that much. Let's pick a focused time period, and show a percentage change. I'm interested in seeing if Jordan Henderson got an uptick in September 2016 after his f*cking stunner:
+This doesn't *really* help that much. Let's pick a focused time period, and show a percentage change. I'm interested in seeing if Jordan Henderson got an uptick in September 2016 after his stunner:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/iK88-Z4KCro" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+<style> 
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 35px;
+    height: 0;
+    overflow: hidden;
+}
+</style>
+
+<div>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/iK88-Z4KCro" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+</div>
 
 ```{r}
 

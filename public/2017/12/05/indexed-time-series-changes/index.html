@@ -44,7 +44,7 @@
                     </h1>
                     <h2 class="headline">
                     Dec 5, 2017 00:00
-                    · 673 words
+                    · 685 words
                     · 4 minutes read
                       <span class="tags">
                       
@@ -166,9 +166,19 @@ ggplot(
   theme(axis.title = element_blank()) +
   scale_y_log10(labels=scales::comma, breaks = c(1e2,1e3,1e4,1e5,1e6))</code></pre>
 <p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>This doesn’t <em>really</em> help that much. Let’s pick a focused time period, and show a percentage change. I’m interested in seeing if Jordan Henderson got an uptick in September 2016 after his f*cking stunner:</p>
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=iK88-Z4KCro" frameborder="0" allowfullscreen>
-</iframe>
+<p>This doesn’t <em>really</em> help that much. Let’s pick a focused time period, and show a percentage change. I’m interested in seeing if Jordan Henderson got an uptick in September 2016 after his stunner:</p>
+<style> 
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 35px;
+    height: 0;
+    overflow: hidden;
+}
+</style>
+<div>
+<p><iframe width="560" height="315" src="https://www.youtube.com/embed/iK88-Z4KCro" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe></p>
+</div>
 <pre class="r"><code>ggplot(
   trend_data %&gt;%
     filter( date &gt;= &#39;2016-09-01&#39;, date &lt; &#39;2016-10-01&#39;)

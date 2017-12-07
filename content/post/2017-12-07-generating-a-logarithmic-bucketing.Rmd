@@ -1,0 +1,170 @@
+---
+title: Generating A Logarithmic Bucketing in R
+author: porter
+date: '2017-12-07'
+slug: generating-a-logarithmic-bucketing
+categories: ['R', 'Data Mutation']
+tags: ['R','Data Mutation','rstats']
+keywords: ['R','Data Mutation','rstats']
+description: 'Binning a continuous measurement with a wide range into logarithmic buckets'
+---
+
+```{r global_options, include=FALSE}
+
+knitr::opts_chunk$set(
+    fig.align = 'center'
+    , message = FALSE
+    , warning = FALSE
+    , error = FALSE
+    , cache = TRUE
+  )
+
+```
+
+
+<h1>COPY / PASTE HERE: </h1>
+
+> c(1 %o% 10^(3:7))
+
+Some of the datasets I deal with are lognormally distributed. Basically what this means is they follow the 80/20 rule where 80% of the sum of the values comes from the top 20% of the observations when sorted descending. There are a lot of observations with very low values relative to the range. Often I bucket things into bins for reporting based on log base-10 rule where we bucket "observations less than 10", then observations less than 100 then 1,000 then 10,000 etc. This helps make large distributions more easily digestible and helps any observer quickly get a feel for the state of the data.
+
+When I don't have time to mess around with googling stuff I'll write this out the way my brain says it. e.g. with ifelse() inside a mutate().
+
+```{r mutate_ifelse, eval=FALSE}
+dataframe %<>%
+  mutate(
+    bucket = ifelse(
+      n <= 10,'<=10'
+      , n<= 100, '<= 100'
+      , n <= 1000, '<= 1,000'
+      ...
+    )
+  )
+```
+
+This obviously **SUCKS**. R is built for crap like this using stuff like the `cut()` function.
+
+The problem with cut though is that I still found myself writing long statements with manual breaks. e.g.
+
+```{r cut_manual, eval=FALSE}
+
+```{r eval=FALSE}
+dataframe %<>%
+  mutate(
+    bucket = cut(
+      n
+      , breaks=c(0,10,100,1e3,1e4,1e5,1e6,1e7,1e8)
+      , labels=c('<= 10','<= 100','<= 1,000','<= 10,000','<= 100,000','<= 1,000,000','<= 10,000,000','<= 100,000,000')
+    )
+  )
+```
+
+That was better. But that obviously still sucks.
+
+This type of binning in R is easy using the [`%o%` operator](https://cran.r-project.org/doc/manuals/R-lang.html#Operators). The labeling is just as easy with a simple formatting wrapper.
+
+So let's generate a lognormal distribution with some really high outliers. Credit [here](https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/) for the way to do this.
+
+```{r generate_impressions}
+
+m <- 2392
+s <- 42699
+
+location <- log(m^2 / sqrt(s^2 + m^2))
+
+shape <- sqrt(log(1 + (s^2 / m^2)))
+
+impressions <- data.frame(rlnorm(n=1000000, location, shape))
+
+names( impressions) <-'imps'
+
+head( impressions)
+
+```
+
+You can see this is pretty heavily biased to the low end:
+
+```{r plots_1}
+
+library( ggplot2)
+
+ggplot(impressions, aes(x=imps)) +
+  geom_density() +
+  scale_x_continuous(labels=scales::comma) +
+  labs(title = 'Absolute X-Axis')
+
+ggplot(impressions, aes(x=imps)) +
+  geom_density() +
+  scale_x_log10(labels=scales::comma) +
+  labs(title = 'scale_x_log10() axis')
+
+```
+
+So let's bin this up using this fancy `%o%` "outer product" operator
+
+```{r cut}
+library( dplyr)
+library( magrittr)
+library( scales)
+
+impressions %<>%
+  mutate(
+    bucket = cut(
+      imps
+      , breaks = c(0,1 %o% 10^(1:8))
+      , labels = c(paste0('<= ',scales::comma(c(1 %o% 10^(1:8)))))
+    )
+  )
+
+head(impressions)
+```
+
+Let's see how many imps are in each bucket
+
+```{r sum_up}
+
+
+bucketed <- impressions %>% 
+  group_by(bucket) %>% 
+  summarise(imps = sum(as.numeric(imps), na.rm=T)) %>%
+  ungroup() %>% 
+  mutate(
+    pct_imps = imps / sum(imps)
+    , imps = imps
+  ) %>% 
+  arrange(bucket)
+
+library( DT)
+
+DT::datatable(bucketed, options = list(dom='t')) %>% 
+  formatCurrency('imps',currency='',digits=0) %>% 
+  formatPercentage('pct_imps')
+
+```
+
+Then get a promotion by making it pretty
+
+```{r plot_it_out}
+
+ggplot(
+  bucketed
+  , aes(x=bucket, y = pct_imps)
+) +
+  geom_col(fill='#ed4956') +
+  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  theme_bw() +
+  theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs( title='Percentage by Bucket') +
+  scale_y_continuous(labels=scales::percent)
+
+```
+
+
+<img src='https://i.imgur.com/yRUGCRo.gif' />
+
+
+
+
+
+
+

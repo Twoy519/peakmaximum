@@ -98,7 +98,7 @@ ggplot(
 <p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>There are a couple methods of dealing with this.</p>
 <ol style="list-style-type: decimal">
-<li><p>change the scale on the y-axis to a log-transformed scale.</p></li>
+<li><p>Change the scale on the y-axis to a log-transformed scale.</p></li>
 <li><p>Normalize the values by showing percent change instead of absolute values.</p></li>
 </ol>
 <pre class="r"><code>ggplot(
@@ -203,3 +203,4 @@ ggplot(
   theme(axis.title = element_blank(), panel.background = element_rect(fill=&#39;#E0E0E0&#39;)) +
   scale_y_continuous( labels=scales::percent)</code></pre>
 <p><img src="/post/2017-12-05-indexed-time-series-changes_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>After this we can implement some simple z-scores (fancy word for normalizing) to get a feel for who’s trending. That’ll be another post though.</p>

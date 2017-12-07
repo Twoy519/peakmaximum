@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rstats on Maximuming At The Peak</title>
+    <link>/tags/rstats/</link>
+    <description>Recent content in Rstats on Maximuming At The Peak</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 07 Dec 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/rstats/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Generating A Logarithmic Bucketing in R</title>
+      <link>/2017/12/07/generating-a-logarithmic-bucketing/</link>
+      <pubDate>Thu, 07 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/12/07/generating-a-logarithmic-bucketing/</guid>
+      <description>COPY / PASTE HERE:   c(1 %o% 10^(3:7))
+ Some of the datasets I deal with are lognormally distributed. Basically what this means is they follow the 80/20 rule where 80% of the sum of the values comes from the top 20% of the observations when sorted descending. There are a lot of observations with very low values relative to the range. Often I bucket things into bins for reporting based on log base-10 rule where we bucket “observations less than 10”, then observations less than 100 then 1,000 then 10,000 etc.</description>
+    </item>
+    
+  </channel>
+</rss>

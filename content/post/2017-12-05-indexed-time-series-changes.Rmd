@@ -111,7 +111,8 @@ ggplot(
 
 There are a couple methods of dealing with this.
 
-1. change the scale on the y-axis to a log-transformed scale.
+
+1. Change the scale on the y-axis to a log-transformed scale.
 
 2. Normalize the values by showing percent change instead of absolute values.
 
@@ -241,7 +242,7 @@ ggplot(
 
 ```
 
-
+After this we can implement some simple z-scores (fancy word for normalizing) to get a feel for who's trending. That'll be another post though.
 
 
 

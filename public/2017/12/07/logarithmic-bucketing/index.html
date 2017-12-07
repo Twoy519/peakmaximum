@@ -1,0 +1,253 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="A website built through Hugo and blogdown.">
+		<meta name="generator" content="Hugo 0.31.1" />
+		<title>Logarithmic Bucketing in R &middot; Maximuming At The Peak</title>
+		<link rel="shortcut icon" href="/images/favicon.ico">
+		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/highlight.css">
+		
+
+		
+		<link rel="stylesheet" href="/css/monosocialiconsfont.css">
+		
+
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='/post'>Archive</a>
+	<a href='/tags'>Tags</a>
+	<a href='/about'>About</a>
+
+	
+
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Logarithmic Bucketing in R
+                    </h1>
+                    <h2 class="headline">
+                    Dec 2017
+                    · 603 words
+                    · 3 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="/tags/r">R</a>
+                          
+                              <a href="/tags/data-mutation">Data Mutation</a>
+                          
+                              <a href="/tags/rstats">rstats</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<script src="/rmarkdown-libs/datatables-binding/datatables.js"></script>
+<link href="/rmarkdown-libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="/rmarkdown-libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/dt-core/js/jquery.dataTables.min.js"></script>
+
+
+<h1>
+COPY / PASTE HERE:
+</h1>
+<blockquote>
+<p>c(1 %o% 10^(3:7))</p>
+</blockquote>
+<p>Some of the datasets I deal with are lognormally distributed. Basically what this means is they follow the 80/20 rule where 80% of the sum of the values comes from the top 20% of the observations when sorted descending. There are a lot of observations with very low values relative to the range. Often I bucket things into bins for reporting based on log base-10 rule where we bucket “observations less than 10”, then observations less than 100 then 1,000 then 10,000 etc. This helps make large distributions more easily digestible and helps any observer quickly get a feel for the state of the data.</p>
+<p>When I don’t have time to mess around with googling stuff I’ll write this out the way my brain says it. e.g. with ifelse() inside a mutate().</p>
+<pre class="r"><code>dataframe %&lt;&gt;%
+  mutate(
+    bucket = ifelse(
+      n &lt;= 10,&#39;&lt;=10&#39;
+      , n&lt;= 100, &#39;&lt;= 100&#39;
+      , n &lt;= 1000, &#39;&lt;= 1,000&#39;
+      ...
+    )
+  )</code></pre>
+<p>This obviously <strong>SUCKS</strong>. R is built for crap like this using stuff like the <code>cut()</code> function.</p>
+<p>The problem with cut though is that I still found myself writing long statements with manual breaks. e.g.</p>
+<pre class="r"><code>dataframe %&lt;&gt;%
+  mutate(
+    bucket = cut(
+      n
+      , breaks=c(0,10,100,1e3,1e4,1e5,1e6,1e7,1e8)
+      , labels=c(&#39;&lt;= 10&#39;,&#39;&lt;= 100&#39;,&#39;&lt;= 1,000&#39;,&#39;&lt;= 10,000&#39;,&#39;&lt;= 100,000&#39;,&#39;&lt;= 1,000,000&#39;,&#39;&lt;= 10,000,000&#39;,&#39;&lt;= 100,000,000&#39;)
+    )
+  )</code></pre>
+<p>That was better. But that obviously still sucks.</p>
+<p>This type of binning in R is easy using the <a href="https://cran.r-project.org/doc/manuals/R-lang.html#Operators"><code>%o%</code> operator</a>. The labeling is just as easy with a simple formatting wrapper.</p>
+<p>So let’s generate a lognormal distribution with some really high outliers. Credit <a href="https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/">here</a> for the way to do this.</p>
+<pre class="r"><code>m &lt;- 2392
+s &lt;- 42699
+
+location &lt;- log(m^2 / sqrt(s^2 + m^2))
+
+shape &lt;- sqrt(log(1 + (s^2 / m^2)))
+
+impressions &lt;- data.frame(rlnorm(n=1000000, location, shape))
+
+names( impressions) &lt;-&#39;imps&#39;
+
+head( impressions)</code></pre>
+<pre><code>##         imps
+## 1  144.52557
+## 2  152.33253
+## 3  634.11697
+## 4   28.66744
+## 5  115.42067
+## 6 2872.24428</code></pre>
+<p>You can see this is pretty heavily biased to the low end:</p>
+<pre class="r"><code>library( ggplot2)
+
+ggplot( impressions, aes(x=imps)) +
+  geom_density() +
+  scale_x_continuous(labels=scales::comma) +
+  labs(title = &#39;Absolute X-Axis&#39;)</code></pre>
+<p><img src="/post/2017-12-07-generating-a-logarithmic-bucketing_files/figure-html/plots_1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(impressions, aes(x=imps)) +
+  geom_density() +
+  scale_x_log10(labels=scales::comma) +
+  labs(title = &#39;scale_x_log10() axis&#39;)</code></pre>
+<p><img src="/post/2017-12-07-generating-a-logarithmic-bucketing_files/figure-html/plots_1-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>So let’s bin this up using this fancy <code>%o%</code> “outer product” operator</p>
+<pre class="r"><code>library( dplyr)
+library( magrittr)
+library( scales)
+
+ 
+impressions %&lt;&gt;%
+  mutate(
+    bucket = cut(
+      imps
+      , breaks = c(0,1 %o% 10^(1:8))
+      , labels = c(paste0(&#39;&lt;= &#39;,scales::comma(c(1 %o% 10^(1:8)))))
+    )
+  )
+
+head(impressions)</code></pre>
+<pre><code>##         imps    bucket
+## 1  144.52557  &lt;= 1,000
+## 2  152.33253  &lt;= 1,000
+## 3  634.11697  &lt;= 1,000
+## 4   28.66744    &lt;= 100
+## 5  115.42067  &lt;= 1,000
+## 6 2872.24428 &lt;= 10,000</code></pre>
+<p>Let’s see how many imps are in each bucket</p>
+<pre class="r"><code>bucketed &lt;- impressions %&gt;% 
+  dplyr::group_by(bucket) %&gt;% 
+  dplyr::summarise(
+    imps = sum(as.numeric(imps), na.rm=T)
+    , observations = n()
+  ) %&gt;%
+  dplyr::ungroup() %&gt;% 
+  dplyr::mutate(
+    pct_imps = imps / sum(imps)
+    , pct_observations = observations / sum(observations)
+    , imps = imps
+  ) %&gt;%
+  dplyr::arrange(bucket)
+
+library( DT)
+
+DT::datatable(bucketed, options = list(dom=&#39;t&#39;)) %&gt;% 
+  formatCurrency(&#39;imps&#39;,currency=&#39;&#39;,digits=0) %&gt;% 
+  formatPercentage(c(&#39;pct_imps&#39;,&#39;pct_observations&#39;))</code></pre>
+<div id="htmlwidget-1" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8"],["&lt;= 10","&lt;= 100","&lt;= 1,000","&lt;= 10,000","&lt;= 100,000","&lt;= 1,000,000","&lt;= 10,000,000","&lt;= 100,000,000"],[594003.26231895,13316351.0642052,127213232.058124,512742300.416599,868821204.565926,627717027.841395,200309509.523965,28968994.6681698],[139599,311391,347636,165227,33235,2811,99,2],[0.00024961448912464,0.00559585170444928,0.0534580665535679,0.215466674158364,0.365099612873724,0.263781826058952,0.0841748843119724,0.0121734698498455],[0.139599,0.311391,0.347636,0.165227,0.033235,0.002811,9.9e-05,2e-06]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>bucket<\/th>\n      <th>imps<\/th>\n      <th>observations<\/th>\n      <th>pct_imps<\/th>\n      <th>pct_observations<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatPercentage(this, row, data, 4, 0);\nDTWidget.formatPercentage(this, row, data, 5, 0);\nDTWidget.formatCurrency(this, row, data, 2, '', 0, 3, ',', '.', true);\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+<p>Then get a promotion by making it pretty</p>
+<pre class="r"><code>ggplot(
+  bucketed
+  , aes(x=bucket, y = pct_imps)
+) +
+  geom_col(fill=&#39;#ed4956&#39;) +
+  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  theme_bw() +
+  theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs( title=&#39;Percentage of Imps by Bucket&#39;) +
+  scale_y_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2017-12-07-generating-a-logarithmic-bucketing_files/figure-html/plot_it_out-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(
+  bucketed
+  , aes(x=bucket, y = pct_observations)
+) +
+  geom_col(fill=&#39;#3b5998&#39;) +
+  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  theme_bw() +
+  theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs( title=&#39;Percentage of Observations by Bucket&#39;) +
+  scale_y_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2017-12-07-generating-a-logarithmic-bucketing_files/figure-html/pct_observations-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src='https://i.imgur.com/yRUGCRo.gif' /></p>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2017 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="/js/jquery-2.2.4.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-108019207-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>

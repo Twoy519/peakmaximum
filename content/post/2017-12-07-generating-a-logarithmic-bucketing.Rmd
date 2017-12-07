@@ -21,6 +21,12 @@ knitr::opts_chunk$set(
 
 ```
 
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/its_log.png")
+
+```
+
 
 <h1>COPY / PASTE HERE: </h1>
 

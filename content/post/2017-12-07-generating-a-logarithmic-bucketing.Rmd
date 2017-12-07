@@ -47,8 +47,6 @@ This obviously **SUCKS**. R is built for crap like this using stuff like the `cu
 The problem with cut though is that I still found myself writing long statements with manual breaks. e.g.
 
 ```{r cut_manual, eval=FALSE}
-
-```{r eval=FALSE}
 dataframe %<>%
   mutate(
     bucket = cut(
@@ -88,7 +86,7 @@ You can see this is pretty heavily biased to the low end:
 
 library( ggplot2)
 
-ggplot(impressions, aes(x=imps)) +
+ggplot( impressions, aes(x=imps)) +
   geom_density() +
   scale_x_continuous(labels=scales::comma) +
   labs(title = 'Absolute X-Axis')
@@ -107,6 +105,7 @@ library( dplyr)
 library( magrittr)
 library( scales)
 
+ 
 impressions %<>%
   mutate(
     bucket = cut(
@@ -123,22 +122,25 @@ Let's see how many imps are in each bucket
 
 ```{r sum_up}
 
-
 bucketed <- impressions %>% 
-  group_by(bucket) %>% 
-  summarise(imps = sum(as.numeric(imps), na.rm=T)) %>%
-  ungroup() %>% 
-  mutate(
+  dplyr::group_by(bucket) %>% 
+  dplyr::summarise(
+    imps = sum(as.numeric(imps), na.rm=T)
+    , observations = n()
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
     pct_imps = imps / sum(imps)
+    , pct_observations = observations / sum(observations)
     , imps = imps
-  ) %>% 
-  arrange(bucket)
+  ) %>%
+  dplyr::arrange(bucket)
 
 library( DT)
 
 DT::datatable(bucketed, options = list(dom='t')) %>% 
   formatCurrency('imps',currency='',digits=0) %>% 
-  formatPercentage('pct_imps')
+  formatPercentage(c('pct_imps','pct_observations'))
 
 ```
 
@@ -154,10 +156,27 @@ ggplot(
   geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
-  labs( title='Percentage by Bucket') +
+  labs( title='Percentage of Imps by Bucket') +
   scale_y_continuous(labels=scales::percent)
 
 ```
+
+```{r pct_observations}
+
+ggplot(
+  bucketed
+  , aes(x=bucket, y = pct_observations)
+) +
+  geom_col(fill='#3b5998') +
+  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  theme_bw() +
+  theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs( title='Percentage of Observations by Bucket') +
+  scale_y_continuous(labels=scales::percent)
+
+
+```
+
 
 
 <img src='https://i.imgur.com/yRUGCRo.gif' />

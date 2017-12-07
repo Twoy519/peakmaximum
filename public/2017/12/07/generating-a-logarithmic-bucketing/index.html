@@ -43,8 +43,8 @@
                         Generating A Logarithmic Bucketing in R
                     </h1>
                     <h2 class="headline">
-                    Dec 7, 2017
-                    · 546 words
+                    Dec 2017
+                    · 603 words
                     · 3 minutes read
                       <span class="tags">
                       
@@ -123,7 +123,7 @@ head( impressions)</code></pre>
 <p>You can see this is pretty heavily biased to the low end:</p>
 <pre class="r"><code>library( ggplot2)
 
-ggplot(impressions, aes(x=imps)) +
+ggplot( impressions, aes(x=imps)) +
   geom_density() +
   scale_x_continuous(labels=scales::comma) +
   labs(title = &#39;Absolute X-Axis&#39;)</code></pre>
@@ -138,6 +138,7 @@ ggplot(impressions, aes(x=imps)) +
 library( magrittr)
 library( scales)
 
+ 
 impressions %&lt;&gt;%
   mutate(
     bucket = cut(
@@ -157,22 +158,26 @@ head(impressions)</code></pre>
 ## 6 2872.24428 &lt;= 10,000</code></pre>
 <p>Let’s see how many imps are in each bucket</p>
 <pre class="r"><code>bucketed &lt;- impressions %&gt;% 
-  group_by(bucket) %&gt;% 
-  summarise(imps = sum(as.numeric(imps), na.rm=T)) %&gt;%
-  ungroup() %&gt;% 
-  mutate(
+  dplyr::group_by(bucket) %&gt;% 
+  dplyr::summarise(
+    imps = sum(as.numeric(imps), na.rm=T)
+    , observations = n()
+  ) %&gt;%
+  dplyr::ungroup() %&gt;% 
+  dplyr::mutate(
     pct_imps = imps / sum(imps)
+    , pct_observations = observations / sum(observations)
     , imps = imps
-  ) %&gt;% 
-  arrange(bucket)
+  ) %&gt;%
+  dplyr::arrange(bucket)
 
 library( DT)
 
 DT::datatable(bucketed, options = list(dom=&#39;t&#39;)) %&gt;% 
   formatCurrency(&#39;imps&#39;,currency=&#39;&#39;,digits=0) %&gt;% 
-  formatPercentage(&#39;pct_imps&#39;)</code></pre>
+  formatPercentage(c(&#39;pct_imps&#39;,&#39;pct_observations&#39;))</code></pre>
 <div id="htmlwidget-1" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8"],["&lt;= 10","&lt;= 100","&lt;= 1,000","&lt;= 10,000","&lt;= 100,000","&lt;= 1,000,000","&lt;= 10,000,000","&lt;= 100,000,000"],[594003.26231895,13316351.0642052,127213232.058124,512742300.416599,868821204.565926,627717027.841395,200309509.523965,28968994.6681698],[0.00024961448912464,0.00559585170444928,0.0534580665535679,0.215466674158364,0.365099612873724,0.263781826058952,0.0841748843119724,0.0121734698498455]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>bucket<\/th>\n      <th>imps<\/th>\n      <th>pct_imps<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatPercentage(this, row, data, 3, 0);\nDTWidget.formatCurrency(this, row, data, 2, '', 0, 3, ',', '.', true);\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8"],["&lt;= 10","&lt;= 100","&lt;= 1,000","&lt;= 10,000","&lt;= 100,000","&lt;= 1,000,000","&lt;= 10,000,000","&lt;= 100,000,000"],[594003.26231895,13316351.0642052,127213232.058124,512742300.416599,868821204.565926,627717027.841395,200309509.523965,28968994.6681698],[139599,311391,347636,165227,33235,2811,99,2],[0.00024961448912464,0.00559585170444928,0.0534580665535679,0.215466674158364,0.365099612873724,0.263781826058952,0.0841748843119724,0.0121734698498455],[0.139599,0.311391,0.347636,0.165227,0.033235,0.002811,9.9e-05,2e-06]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>bucket<\/th>\n      <th>imps<\/th>\n      <th>observations<\/th>\n      <th>pct_imps<\/th>\n      <th>pct_observations<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatPercentage(this, row, data, 4, 0);\nDTWidget.formatPercentage(this, row, data, 5, 0);\nDTWidget.formatCurrency(this, row, data, 2, '', 0, 3, ',', '.', true);\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
 <p>Then get a promotion by making it pretty</p>
 <pre class="r"><code>ggplot(
   bucketed
@@ -182,9 +187,20 @@ DT::datatable(bucketed, options = list(dom=&#39;t&#39;)) %&gt;%
   geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
-  labs( title=&#39;Percentage by Bucket&#39;) +
+  labs( title=&#39;Percentage of Imps by Bucket&#39;) +
   scale_y_continuous(labels=scales::percent)</code></pre>
 <p><img src="/post/2017-12-07-generating-a-logarithmic-bucketing_files/figure-html/plot_it_out-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(
+  bucketed
+  , aes(x=bucket, y = pct_observations)
+) +
+  geom_col(fill=&#39;#3b5998&#39;) +
+  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  theme_bw() +
+  theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs( title=&#39;Percentage of Observations by Bucket&#39;) +
+  scale_y_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2017-12-07-generating-a-logarithmic-bucketing_files/figure-html/pct_observations-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src='https://i.imgur.com/yRUGCRo.gif' /></p>
 
                 </section>

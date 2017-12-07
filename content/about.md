@@ -1,5 +1,6 @@
 ---
 title: "About Me"
+date: '2017-01-01'
 ---
 
 ![This is me](/img/troy_profile.png)

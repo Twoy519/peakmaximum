@@ -22,7 +22,10 @@ description: 'Binning a continuous measurement with a wide range into logarithmi
 COPY / PASTE HERE:
 </h1>
 <blockquote>
-<p>c(1 %o% 10^(3:7))</p>
+<p>c(0,10^(1:7))</p>
+</blockquote>
+<blockquote>
+<p>c(0,10^(1:7))</p>
 </blockquote>
 <p>Some of the datasets I deal with are lognormally distributed. Basically what this means is they follow the 80/20 rule where 80% of the sum of the values comes from the top 20% of the observations when sorted descending. There are a lot of observations with very low values relative to the range. Often I bucket things into bins for reporting based on log base-10 rule where we bucket “observations less than 10”, then observations less than 100 then 1,000 then 10,000 etc. This helps make large distributions more easily digestible and helps any observer quickly get a feel for the state of the data.</p>
 <p>When I don’t have time to mess around with googling stuff I’ll write this out the way my brain says it. e.g. with ifelse() inside a mutate().</p>
@@ -46,7 +49,7 @@ COPY / PASTE HERE:
     )
   )</code></pre>
 <p>That was better. But that obviously still sucks.</p>
-<p>This type of binning in R is easy using the <a href="https://cran.r-project.org/doc/manuals/R-lang.html#Operators"><code>%o%</code> operator</a>. The labeling is just as easy with a simple formatting wrapper.</p>
+<p>This type of binning in R is easy with R’s syntax <code>10^(1:n)</code>.</p>
 <p>So let’s generate a lognormal distribution with some really high outliers. Credit <a href="https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/">here</a> for the way to do this. The numbers I’m using for the mean (<code>m</code>) and standard deviation (<code>s</code>) are random. I chose them just to generate a distribution in the desired shape.</p>
 <pre class="r"><code>m &lt;- 2000
 s &lt;- 40000
@@ -80,7 +83,7 @@ ggplot( impressions, aes(x=imps)) +
   scale_x_log10(labels=scales::comma) +
   labs(title = &#39;scale_x_log10() axis&#39;)</code></pre>
 <p><img src="/post/2017-12-07-generating-a-logarithmic-bucketing_files/figure-html/plots_1-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>So let’s bin this up using this fancy <code>%o%</code> “outer product” operator</p>
+<p>So let’s bin this up into logarithmic bins.</p>
 <pre class="r"><code>library( dplyr)
 library( magrittr)
 library( scales)
@@ -90,19 +93,19 @@ impressions %&lt;&gt;%
   mutate(
     bucket = cut(
       imps
-      , breaks = c(0,1 %o% 10^(1:8))
-      , labels = c(paste0(&#39;&lt;= &#39;,scales::comma(c(1 %o% 10^(1:8)))))
+      , breaks = c(0,10^(1:8))
+      , labels = c(paste0(&#39;&lt;= &#39;,scales::comma(c(10^(1:8)))))
     )
   )
 
 head(impressions)</code></pre>
-<pre><code>##         imps    bucket
-## 1  144.52557  &lt;= 1,000
-## 2  152.33253  &lt;= 1,000
-## 3  634.11697  &lt;= 1,000
-## 4   28.66744    &lt;= 100
-## 5  115.42067  &lt;= 1,000
-## 6 2872.24428 &lt;= 10,000</code></pre>
+<pre><code>##          imps     bucket
+## 1   117.05296   &lt;= 1,000
+## 2   650.17365   &lt;= 1,000
+## 3    80.80932     &lt;= 100
+## 4  2006.32298  &lt;= 10,000
+## 5    16.63146     &lt;= 100
+## 6 14139.12628 &lt;= 100,000</code></pre>
 <p>Let’s see how many imps are in each bucket</p>
 <pre class="r"><code>bucketed &lt;- impressions %&gt;% 
   dplyr::group_by(bucket) %&gt;% 

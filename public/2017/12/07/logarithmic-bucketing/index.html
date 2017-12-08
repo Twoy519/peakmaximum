@@ -44,7 +44,7 @@
                     </h1>
                     <h2 class="headline">
                     Dec 2017
-                    · 603 words
+                    · 629 words
                     · 3 minutes read
                       <span class="tags">
                       
@@ -101,9 +101,9 @@ COPY / PASTE HERE:
   )</code></pre>
 <p>That was better. But that obviously still sucks.</p>
 <p>This type of binning in R is easy using the <a href="https://cran.r-project.org/doc/manuals/R-lang.html#Operators"><code>%o%</code> operator</a>. The labeling is just as easy with a simple formatting wrapper.</p>
-<p>So let’s generate a lognormal distribution with some really high outliers. Credit <a href="https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/">here</a> for the way to do this.</p>
-<pre class="r"><code>m &lt;- 2392
-s &lt;- 42699
+<p>So let’s generate a lognormal distribution with some really high outliers. Credit <a href="https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/">here</a> for the way to do this. The numbers I’m using for the mean (<code>m</code>) and standard deviation (<code>s</code>) are random. I chose them just to generate a distribution in the desired shape.</p>
+<pre class="r"><code>m &lt;- 2000
+s &lt;- 40000
 
 location &lt;- log(m^2 / sqrt(s^2 + m^2))
 
@@ -114,13 +114,13 @@ impressions &lt;- data.frame(rlnorm(n=1000000, location, shape))
 names( impressions) &lt;-&#39;imps&#39;
 
 head( impressions)</code></pre>
-<pre><code>##         imps
-## 1  144.52557
-## 2  152.33253
-## 3  634.11697
-## 4   28.66744
-## 5  115.42067
-## 6 2872.24428</code></pre>
+<pre><code>##          imps
+## 1   117.05296
+## 2   650.17365
+## 3    80.80932
+## 4  2006.32298
+## 5    16.63146
+## 6 14139.12628</code></pre>
 <p>You can see this is pretty heavily biased to the low end:</p>
 <pre class="r"><code>library( ggplot2)
 
@@ -196,7 +196,7 @@ DT::datatable(bucketed, options = list(dom=&#39;t&#39;)) %&gt;%
   , aes(x=bucket, y = pct_observations)
 ) +
   geom_col(fill=&#39;#3b5998&#39;) +
-  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  geom_text(aes(label=scales::percent(pct_observations)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs( title=&#39;Percentage of Observations by Bucket&#39;) +

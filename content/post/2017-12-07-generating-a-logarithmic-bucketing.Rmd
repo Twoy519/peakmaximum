@@ -67,12 +67,12 @@ That was better. But that obviously still sucks.
 
 This type of binning in R is easy using the [`%o%` operator](https://cran.r-project.org/doc/manuals/R-lang.html#Operators). The labeling is just as easy with a simple formatting wrapper.
 
-So let's generate a lognormal distribution with some really high outliers. Credit [here](https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/) for the way to do this.
+So let's generate a lognormal distribution with some really high outliers. Credit [here](https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/) for the way to do this. The numbers I'm using for the mean (`m`) and standard deviation (`s`) are random. I chose them just to generate a distribution in the desired shape.
 
 ```{r generate_impressions}
 
-m <- 2392
-s <- 42699
+m <- 2000
+s <- 40000
 
 location <- log(m^2 / sqrt(s^2 + m^2))
 
@@ -174,7 +174,7 @@ ggplot(
   , aes(x=bucket, y = pct_observations)
 ) +
   geom_col(fill='#3b5998') +
-  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  geom_text(aes(label=scales::percent(pct_observations)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs( title='Percentage of Observations by Bucket') +

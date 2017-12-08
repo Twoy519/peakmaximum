@@ -32,7 +32,7 @@ knitr::include_graphics("/img/its_log.png")
 
 > c(0,10^(1:7))
 
-> c(0,10^(1:7))
+> paste0('<= ',scales::comma(c(10^(1:7))))
 
 Some of the datasets I deal with are lognormally distributed. Basically what this means is they follow the 80/20 rule where 80% of the sum of the values comes from the top 20% of the observations when sorted descending. There are a lot of observations with very low values relative to the range. Often I bucket things into bins for reporting based on log base-10 rule where we bucket "observations less than 10", then observations less than 100 then 1,000 then 10,000 etc. This helps make large distributions more easily digestible and helps any observer quickly get a feel for the state of the data.
 

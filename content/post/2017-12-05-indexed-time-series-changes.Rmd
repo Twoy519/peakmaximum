@@ -103,7 +103,7 @@ ggplot(
   geom_line() +
   theme_bw() +
   scale_color_brewer(palette='Set1') +
-  labs(title = 'Wikipedia Pageviews of EPL footballers since Jan 2016') +
+  labs(title = 'Wikipedia Pageviews of Footballers since Jan 2016') +
   theme(axis.title = element_blank()) +
   scale_y_continuous(labels=scales::comma)
 
@@ -131,7 +131,7 @@ ggplot(
   theme_bw() +
   scale_color_brewer(palette='Set1') +
   labs(
-    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    title = 'Wikipedia Pageviews of Footballers since Jan 2016'
     , subtitle = 'Log-scaled y-axis'
   ) +
   theme(axis.title = element_blank()) +
@@ -171,7 +171,7 @@ ggplot(
   theme_bw() +
   scale_color_brewer(palette='Set1') +
   labs(
-    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    title = 'Wikipedia Pageviews of Footballers since Jan 2016'
     , subtitle = 'Log-scaled y-axis'
   ) +
   theme(axis.title = element_blank(), panel.background = element_rect(fill='#E0E0E0')) +
@@ -199,7 +199,7 @@ ggplot(
   theme_bw() +
   scale_color_brewer(palette='Set1') +
   labs(
-    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    title = 'Wikipedia Pageviews of Footballers since Jan 2016'
     , subtitle = 'Log-scaled y-axis'
   ) +
   theme(axis.title = element_blank(), panel.background = element_rect(fill='#E0E0E0')) +
@@ -234,7 +234,7 @@ ggplot(
   theme_bw() +
   scale_color_brewer(palette='Set1') +
   labs(
-    title = 'Wikipedia Pageviews of EPL footballers since Jan 2016'
+    title = 'Wikipedia Pageviews of Footballers since Jan 2016'
     , subtitle = 'Log-scaled y-axis'
   ) +
   theme(axis.title = element_blank(), panel.background = element_rect(fill='#E0E0E0')) +

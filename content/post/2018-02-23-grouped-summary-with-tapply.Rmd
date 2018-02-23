@@ -5,7 +5,7 @@ date: '2018-02-23'
 slug: grouped-summary-with-tapply
 categories: ['Data Visualization','R']
 tags: ['R','DataViz']
-description: ['Generating grouped 5-stat summaries with tapply()']
+description: 'Generating grouped 5-stat summaries with `tapply()`'
 keywords: ['rstats']
 ---
 

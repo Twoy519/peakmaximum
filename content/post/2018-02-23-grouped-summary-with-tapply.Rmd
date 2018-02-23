@@ -1,5 +1,5 @@
 ---
-title: Grouped Summary with tapply
+title: Grouped Summary With `tapply()`
 author: porter
 date: '2018-02-23'
 slug: grouped-summary-with-tapply
@@ -19,6 +19,12 @@ knitr::opts_chunk$set(
     , error = FALSE
     , cache = TRUE
   )
+
+```
+
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/grouped_summary_with_tapply/groups.jpg")
 
 ```
 

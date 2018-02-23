@@ -101,7 +101,6 @@ table {
     content: '\e803';
 }
 
-
 /* Spacing */
 
 .post h1, h3, h4, h5, p, #post-body ul, #post-list li, #post-body ol, pre {
@@ -152,6 +151,7 @@ h2 {
     height: 80px;
     /* border-radius: 50%; */
     margin-bottom: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .profile h1 {
@@ -461,6 +461,7 @@ img {
     width: 100%;
     max-width: 100%;
     /* border-radius: 3px; */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 

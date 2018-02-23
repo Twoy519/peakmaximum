@@ -6,10 +6,21 @@
     <description>Recent content in R on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 07 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 23 Feb 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Grouped Summary with tapply</title>
+      <link>/2018/02/23/grouped-summary-with-tapply/</link>
+      <pubDate>Fri, 23 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/02/23/grouped-summary-with-tapply/</guid>
+      <description>COPY / PASTE HERE:   tapply( d.in\(metric, d.in\)group, summary)
+ This is a quick one and sourced from this SO answer but I kept googling it so wanted to just put it up here.
+I’ll often want to quickly view 5-stat summaries of a grouped dataframe. tapply isn’t really a purrr or dplyr approach so people might not think it is elegant but everything I’m googling for purrr or dplyr solutions to this problem statement are really verbose.</description>
+    </item>
     
     <item>
       <title>Logarithmic Bucketing in R</title>

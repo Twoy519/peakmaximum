@@ -6,10 +6,20 @@
     <description>Recent content in Data Visualization on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 23 Feb 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 28 Feb 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/data-visualization/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Expand Grids with...`expand.grid()`</title>
+      <link>/2018/02/28/expand-grids-with-expand-grid/</link>
+      <pubDate>Wed, 28 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/02/28/expand-grids-with-expand-grid/</guid>
+      <description>COPY / PASTE HERE:   expand.grid(seq(0,10), seq(0,10), seq(0,10))
+ Another quick one but useful. I recently had a use-case at work where I was plotting datapoints of events on a 2d canvas. We had thousands of clients and a unique canvas where I needed to paint thousands of events for each client. I decided to normalize everything to a 0-100 scale across the x and y dimensions. The problem which prompted me to use expand.</description>
+    </item>
     
     <item>
       <title>Grouped Summary With `tapply()`</title>

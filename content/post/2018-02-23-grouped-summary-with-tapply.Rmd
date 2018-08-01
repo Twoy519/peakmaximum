@@ -2,10 +2,10 @@
 title: Grouped Summary With `tapply()`
 author: porter
 date: '2018-02-23'
-slug: grouped-summary-with-tapply
+slug: grouped-summary-with-purrr-map
 categories: ['Data Visualization','R']
 tags: ['R','DataViz']
-description: 'Generating grouped 5-stat summaries with `tapply()`'
+description: 'Generating grouped 5-stat summaries with `map()`'
 keywords: ['rstats']
 ---
 
@@ -30,15 +30,16 @@ knitr::include_graphics("/img/grouped_summary_with_tapply/groups.jpg")
 
 <h1>COPY / PASTE HERE: </h1>
 
-> tapply( d.in\$metric, d.in\$group, summary)
+> mtcars %>% split(.\$cyl) %>% map(summary)
 
 This is a quick one and sourced from [this](https://stackoverflow.com/questions/9847054/how-to-get-summary-statistics-by-group) SO answer but I kept googling it so wanted to just put it up here.
 
-I'll often want to quickly view 5-stat summaries of a grouped dataframe. `tapply` isn't really a purrr or dplyr approach so people might not think it is elegant but everything I'm googling for purrr or dplyr solutions to this problem statement are really verbose. This is a one-liner.
 
-```{r tapply}
+```{r purrr}
+require(dplyr)
+require(purrr)
 
-tapply(mtcars$wt, mtcars$cyl, summary)
+mtcars %>% split(.$cyl) %>% map(summary)
 
 ```
 

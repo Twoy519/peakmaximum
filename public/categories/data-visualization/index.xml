@@ -23,13 +23,13 @@
     
     <item>
       <title>Grouped Summary With `tapply()`</title>
-      <link>/2018/02/23/grouped-summary-with-tapply/</link>
+      <link>/2018/02/23/grouped-summary-with-purrr-map/</link>
       <pubDate>Fri, 23 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>/2018/02/23/grouped-summary-with-tapply/</guid>
-      <description>COPY / PASTE HERE:   tapply( d.in$metric, d.in$group, summary)
+      <guid>/2018/02/23/grouped-summary-with-purrr-map/</guid>
+      <description>COPY / PASTE HERE:   mtcars %&amp;gt;% split(.$cyl) %&amp;gt;% map(summary)
  This is a quick one and sourced from this SO answer but I kept googling it so wanted to just put it up here.
-I’ll often want to quickly view 5-stat summaries of a grouped dataframe. tapply isn’t really a purrr or dplyr approach so people might not think it is elegant but everything I’m googling for purrr or dplyr solutions to this problem statement are really verbose.</description>
+require(dplyr) require(purrr) mtcars %&amp;gt;% split(.$cyl) %&amp;gt;% map(summary) ## $`4` ## mpg cyl disp hp ## Min. :21.40 Min. :4 Min. : 71.10 Min. : 52.00 ## 1st Qu.:22.80 1st Qu.:4 1st Qu.: 78.85 1st Qu.</description>
     </item>
     
     <item>

@@ -1,0 +1,184 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="A website built through Hugo and blogdown.">
+		<meta name="generator" content="Hugo 0.31.1" />
+		<title>Visualizing Prophet&#39;s `changepoint.prior.scale` &middot; Maximuming At The Peak</title>
+		<link rel="shortcut icon" href="/images/favicon.ico">
+		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/highlight.css">
+		
+
+		
+		<link rel="stylesheet" href="/css/monosocialiconsfont.css">
+		
+
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='/post'>Archive</a>
+	<a href='/tags'>Tags</a>
+	<a href='/about'>About</a>
+
+	
+
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Visualizing Prophet&#39;s `changepoint.prior.scale`
+                    </h1>
+                    <h2 class="headline">
+                    Dec 2018
+                    · 285 words
+                    · 2 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="/tags/r">R</a>
+                          
+                              <a href="/tags/dataviz">DataViz</a>
+                          
+                              <a href="/tags/prophet">Prophet</a>
+                          
+                              <a href="/tags/forecasting">Forecasting</a>
+                          
+                              <a href="/tags/dataviz">DataViz</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p><img src="/" width="300px" style="display: block; margin: auto;" /></p>
+<div id="what-am-i-doing" class="section level1">
+<h1>What Am I Doing?</h1>
+<p>Facebook has developed an open-source forecasting library for Python and R called <a href="https://facebook.github.io/prophet/">Prophet</a> authored by <a href="https://twitter.com/seanjtaylor">Sean J. Taylor</a>.</p>
+<p>Long story short is that this is a simple API that allows you to feed it a two-column timeseries, and it will generate a forecast for you. The dataset required is simple, just a <code>date</code> column, and then a column for pretty much any number you want. Common examples are ‘price of this thing’, or ‘revenue of my business’.</p>
+<p>They recently upgraded to version 0.4</p>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">We released Prophet 0.4 today! Thanks to all the wonderful contributors ❤️<br><br>Prophet can now automatically generate lists of holidays for over a dozen countries. Just in time for the holidays 🕎🎄😜<br><br>Install: <a href="https://t.co/x1BFZSPqP9">https://t.co/x1BFZSPqP9</a><br>Built-in holiday docs: <a href="https://t.co/QCJUpx4I21">https://t.co/QCJUpx4I21</a> <a href="https://t.co/382u6bTqsL">pic.twitter.com/382u6bTqsL</a></p>&mdash; Sean J. Taylor (@seanjtaylor) <a href="https://twitter.com/seanjtaylor/status/1076176804790947840?ref_src=twsrc%5Etfw">December 21, 2018</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>And this reminded me of a cool animation I made for myself to better understand what one of the inputs <code>changepoint.prior.scale</code> was actually doing.</p>
+<p>Inspired by another writeup from <a href="http://lenkiefer.com/2017/08/10/animation-progress/">Len Keifer</a>, I figured an animated time-series would give me a good idea for comparing different outputs when I toggled this parameter. The below writeup is the process I went through to generate the gif at the top of this post.</p>
+<hr />
+</div>
+<div id="fetching-a-good-time-series-example-dataset" class="section level1">
+<h1>Fetching A Good Time-Series Example Dataset</h1>
+<p>My <a href="http://peakmaximum.com/2017/12/05/indexed-time-series-changes/">earlier post</a> on time-series changes used wikipedia pageviews of various footballers to try and demonstrate how to adjust time-series analysis for magnitude differences in values. We can use that same dataset to feed into Prophet and have it spit out some forecasts as well.</p>
+<p>Using the <code>pageviews</code> package, we can easily pull in pageview stats for Messi, Neymar, and The Egyptian King Mo Salah.</p>
+<!--   ```{r} -->
+<!-- library( pageviews) -->
+<!-- trend_data <- -->
+<!--   article_pageviews( -->
+<!--     project = "en.wikipedia", -->
+<!--     article = c( -->
+<!--       'Lionel_Messi' -->
+<!--       , 'Neymar' -->
+<!--       , 'Mohamed_Salah' -->
+<!--     ), -->
+<!--     start = "2015010100", -->
+<!--     end="2019093000" -->
+<!--   ) -->
+<!-- library( magrittr) -->
+<!-- trend_data %<>% -->
+<!--   mutate( -->
+<!--     date = as.Date( date) -->
+<!--     , article = as.factor( article) -->
+<!--   ) %>% -->
+<!--   select(date, article, views) -->
+<!-- library( dplyr) -->
+<!-- library( scales) -->
+<!-- library( ggplot2) -->
+<!-- glimpse( trend_data) -->
+<!-- ggplot( -->
+<!--   trend_data -->
+<!--   , aes(x=date, y = views, color = article) -->
+<!-- ) + -->
+<!--   geom_line() + -->
+<!--   theme_minimal() + -->
+<!--   scale_y_continuous(labels = scales::comma) + -->
+<!--   labs(title = 'Popular Footballers', subtitle = 'Wikipedia PageViews by Article for Neymar, Salah and Messi', x = element_blank(), y = element_blank()) + -->
+<!--   theme(legend.position = 'top', legend.title = element_blank()) -->
+<!-- ``` -->
+<!-- ## Forecasting With Prophet -->
+<!-- Prophet is relatively straightforward by default. You simply pass it a dataframe with a date and a number, and it gives you a forecast. Using this [doc page](https://facebook.github.io/prophet/docs/quick_start.html#r-api) as a guide, let's give it Messi's page views and see what it projects. -->
+<!-- ```{r} -->
+<!-- library(prophet) -->
+<!-- # prophet does require the numeric variable is called 'y' -->
+<!-- input <- trend_data %>% -->
+<!--   filter( article == 'Lionel_Messi') %>% -->
+<!--   rename( -->
+<!--     y = views -->
+<!--     , ds = date -->
+<!--   ) %>% -->
+<!--   select(ds,y) -->
+<!-- head(input) -->
+<!-- ``` -->
+</div>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2018 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="/js/jquery-2.2.4.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-108019207-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>

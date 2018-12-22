@@ -6,10 +6,20 @@
     <description>Recent content on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Feb 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 22 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Visualizing Prophet Forecasts (And Errors) with furrr, and gganimate</title>
+      <link>/2018/12/22/visualizing-prophet-with-gganimate/</link>
+      <pubDate>Sat, 22 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/12/22/visualizing-prophet-with-gganimate/</guid>
+      <description>Credit Where Credit is Due The idea and methods of using furrr with Prophet here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which works absolute wonders on execution time of running multiple Prophet forecasts.
+ Part 1: Background What Am I Doing? Facebook has developed an open-source forecasting library for Python and R called Prophet authored by Sean J.</description>
+    </item>
     
     <item>
       <title>Expand Grids with...`expand.grid()`</title>

@@ -23,7 +23,6 @@ library( ggplot2) # Viz
 library( viridis) # Pretty colors
 library( lubridate) # Time sucks
 library( purrr) # Apply functions over df
-library( emo) # Emojis. Cuz
 library( knitr) # kable()</code></pre>
 <p>Forunately, the fabled deity Mike Bostock <a href="https://bl.ocks.org/mbostock/5544008">has done this before</a> and <a href="https://gist.githubusercontent.com/mbostock/5544008/raw/446592acc3a9223ad268c7b051a68b814e40789c/schedule.tsv">uploaded the data to his github</a> already.</p>
 <p>Let’s use that.</p>
@@ -291,7 +290,7 @@ glimpse(td_g)</code></pre>
 <li>The y-axis is each station</li>
 <li>Each Train will be an individual line</li>
 </ul>
-<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them 😞</p>
+<p>We’re missing something important though, the distance the trains are traveling. How can we capture that? I bet that value is what was in the column names before we cleaned them.</p>
 <p>Good thing we made a backup of the data in its raw imported form.</p>
 <pre class="r"><code>cities &lt;- unique(td_g$station)
 
@@ -397,5 +396,5 @@ ggplot(
     ) +
   scale_colour_viridis(discrete=T, direction=-1, option = &#39;B&#39;, end = .7)</code></pre>
 <p><img src="/post/2017-10-01-the-train-schedule_files/figure-html/filtered_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>That’s it 😃</p>
+<p>That’s it!</p>
 </div>

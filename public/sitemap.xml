@@ -43,13 +43,13 @@
   </url>
   
   <url>
-    <loc>/categories/data-mutation/</loc>
+    <loc>/tags/data-mutation/</loc>
     <lastmod>2017-12-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/data-mutation/</loc>
+    <loc>/categories/data-mutation/</loc>
     <lastmod>2017-12-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -67,19 +67,13 @@
   </url>
   
   <url>
-    <loc>/categories/forecasting/</loc>
-    <lastmod>2018-12-22T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>/tags/forecasting/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/categories/furrr/</loc>
+    <loc>/categories/forecasting/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -91,13 +85,19 @@
   </url>
   
   <url>
-    <loc>/categories/gganimate/</loc>
+    <loc>/categories/furrr/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/gganimate/</loc>
+    <lastmod>2018-12-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/gganimate/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -115,19 +115,13 @@
   </url>
   
   <url>
-    <loc>/categories/prophet/</loc>
-    <lastmod>2018-12-22T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>/tags/prophet/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/categories/purrr/</loc>
+    <loc>/categories/prophet/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -139,13 +133,19 @@
   </url>
   
   <url>
-    <loc>/categories/r/</loc>
+    <loc>/categories/purrr/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/r/</loc>
+    <lastmod>2018-12-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/r/</loc>
     <lastmod>2018-12-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>

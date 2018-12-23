@@ -433,6 +433,8 @@ ggplot(
 
 Now let's make a gif of our forecast through time, partitioned by the `forecast_date` field!
 
+This long-term view is great because you can see where the `yearly.seasonality=TRUE` kicks in around October 2017.
+
 ```{r}
 library('gganimate')
 
@@ -442,9 +444,9 @@ ggthemr::ggthemr(palette='fresh', type = 'outer')
 
 forecast_plot <- ggplot(
   forecast_df %>% filter(
-    ds >= '2018-01-01',
+    ds >= '2017-01-01',
     ds <= forecast_date + 365,
-    forecast_date >= '2018-01-01'
+    forecast_date >= '2017-01-01'
     )
   , aes(
     x = ds
@@ -457,9 +459,11 @@ forecast_plot <- ggplot(
     , alpha=0.3
   ) +
   geom_line(
-    data = forecast_df %>% filter(ds >= '2018-01-01', ds <= forecast_date, forecast_date >= '2018-01-01')
+    data = forecast_df %>% filter(ds >= '2017-01-01', ds <= forecast_date, forecast_date >= '2017-01-01')
     , aes( y = y/1e6, group=forecast_date)
     ) +
+  scale_x_date(date_breaks = '1 month', date_labels='%b %y') +
+  theme(axis.text.x=element_text(angle=45, hjust = 1)) +
   transition_time(forecast_date) +
   ease_aes('linear') +
   labs(

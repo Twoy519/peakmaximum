@@ -341,7 +341,7 @@ ggplot(
     ) +
   scale_color_manual("", values=c("Input"="black", "Forecast"="tomato", "Actual" = "blue"), guide = guide_legend(reverse=TRUE)) +
   scale_linetype_manual("", values=c("Input"=1, "Forecast"=2, "Actual" = 3), guide = guide_legend(reverse=TRUE)) +
-  labs(title="Wikipedia Daily Pageiews Forecast as of Jan. 1 2017", subtitle='Pageviews in Millions',x = element_blank(), y=element_blank()) +
+  labs(title="Wikipedia Daily Pageviews Forecast as of Jan. 1 2017", subtitle='Pageviews in Millions',x = element_blank(), y=element_blank()) +
   theme(legend.position='top')
 
 ```
@@ -435,13 +435,17 @@ Now let's make a gif of our forecast through time, partitioned by the `forecast_
 
 ```{r}
 library('gganimate')
+
 forecast_df <- forecast_df %>% group_by(forecast_date)
 
 ggthemr::ggthemr(palette='fresh', type = 'outer')
-# ggthemr::ggthemr_reset()
 
 forecast_plot <- ggplot(
-  forecast_df %>% filter(ds >= '2018-01-01', ds <= forecast_date + 365, forecast_date >= '2018-01-01')
+  forecast_df %>% filter(
+    ds >= '2018-01-01',
+    ds <= forecast_date + 365,
+    forecast_date >= '2018-01-01'
+    )
   , aes(
     x = ds
   )
@@ -465,12 +469,6 @@ forecast_plot <- ggplot(
     , y = element_blank()
     )
 
-anim_save(filename="~/Documents/peakmaximum/static/img/forecast_plot.fib", animation = forecast_plot)
+gganimate::animate(forecast_plot, width = 800, height = 600)
 
 ```
-```{r, echo = FALSE, out.width = "300px"}
-
-knitr::include_graphics("/img/forecast_plot.gif")
-
-```
-

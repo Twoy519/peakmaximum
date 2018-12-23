@@ -44,7 +44,7 @@
                     </h1>
                     <h2 class="headline">
                     Dec 2018
-                    · 2155 words
+                    · 2158 words
                     · 11 minutes read
                       <span class="tags">
                       
@@ -343,7 +343,7 @@ ggplot(
     ) +
   scale_color_manual(&quot;&quot;, values=c(&quot;Input&quot;=&quot;black&quot;, &quot;Forecast&quot;=&quot;tomato&quot;, &quot;Actual&quot; = &quot;blue&quot;), guide = guide_legend(reverse=TRUE)) +
   scale_linetype_manual(&quot;&quot;, values=c(&quot;Input&quot;=1, &quot;Forecast&quot;=2, &quot;Actual&quot; = 3), guide = guide_legend(reverse=TRUE)) +
-  labs(title=&quot;Wikipedia Daily Pageiews Forecast as of Jan. 1 2017&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
+  labs(title=&quot;Wikipedia Daily Pageviews Forecast as of Jan. 1 2017&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
   theme(legend.position=&#39;top&#39;)</code></pre>
 <p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>We also have a <strong>separate</strong> forecast that was generated using data up to January 1 <strong>2018</strong>.</p>
@@ -424,13 +424,17 @@ ggplot(
 <h2>Step 3: Make A Pretty gif Of This With gganimate</h2>
 <p>Now let’s make a gif of our forecast through time, partitioned by the <code>forecast_date</code> field!</p>
 <pre class="r"><code>library(&#39;gganimate&#39;)
+
 forecast_df &lt;- forecast_df %&gt;% group_by(forecast_date)
 
 ggthemr::ggthemr(palette=&#39;fresh&#39;, type = &#39;outer&#39;)
-# ggthemr::ggthemr_reset()
 
 forecast_plot &lt;- ggplot(
-  forecast_df %&gt;% filter(ds &gt;= &#39;2018-01-01&#39;, ds &lt;= forecast_date + 365, forecast_date &gt;= &#39;2018-01-01&#39;)
+  forecast_df %&gt;% filter(
+    ds &gt;= &#39;2018-01-01&#39;,
+    ds &lt;= forecast_date + 365,
+    forecast_date &gt;= &#39;2018-01-01&#39;
+    )
   , aes(
     x = ds
   )
@@ -454,8 +458,8 @@ forecast_plot &lt;- ggplot(
     , y = element_blank()
     )
 
-anim_save(filename=&quot;~/Documents/peakmaximum/static/img/forecast_plot.fib&quot;, animation = forecast_plot)</code></pre>
-<p><img src="/img/forecast_plot.gif" width="300px" style="display: block; margin: auto;" /></p>
+gganimate::animate(forecast_plot, width = 800, height = 600)</code></pre>
+<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-23-1.gif" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 

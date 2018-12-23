@@ -440,7 +440,7 @@ library('gganimate')
 
 forecast_df <- forecast_df %>% group_by(forecast_date)
 
-ggthemr::ggthemr(palette='fresh', type = 'outer')
+ggthemr::ggthemr(palette='flat', type = 'outer')
 
 forecast_plot <- ggplot(
   forecast_df %>% filter(
@@ -467,7 +467,7 @@ forecast_plot <- ggplot(
   transition_time(forecast_date) +
   ease_aes('linear') +
   labs(
-    title = 'Wikipedia Page Views Forecast as of Date: {frame_time}'
+    title = 'Wikipedia Pageviews Forecast as of Date: {frame_time}'
     , subtitle='Pageviews in Millions'
     , x = element_blank()
     , y = element_blank()

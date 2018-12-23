@@ -364,7 +364,7 @@ ggplot(
 
 forecast_df &lt;- forecast_df %&gt;% group_by(forecast_date)
 
-ggthemr::ggthemr(palette=&#39;fresh&#39;, type = &#39;outer&#39;)
+ggthemr::ggthemr(palette=&#39;flat&#39;, type = &#39;outer&#39;)
 
 forecast_plot &lt;- ggplot(
   forecast_df %&gt;% filter(

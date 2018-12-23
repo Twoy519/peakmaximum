@@ -1,0 +1,397 @@
+---
+title: Visualizing Prophet Forecasts (And Errors) with furrr, and gganimate
+author: porter
+date: '2018-12-22'
+slug: visualizing-prophet-with-gganimate
+categories: ['Data Visualization','R','Prophet','Forecasting','Data Visualization','gganimate','purrr','furrr']
+tags: ['R','DataViz','Prophet','Forecasting','DataViz','gganimate','purrr','furrr']
+description: "Using gifs to demonstrate Prophet's behavior"
+keywords: ['rstats','prophet','forecasting','gifs','dataviz','visualization','gganimate','purrr','furrr']
+---
+
+
+
+<p><img src="/img/forecast_plot.gif" width="300px" style="display: block; margin: auto;" /></p>
+<div id="credit-where-credit-is-due" class="section level1">
+<h1>Credit Where Credit is Due</h1>
+<p>The idea and methods of using <code>furrr</code> with <code>Prophet</code> here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which works absolute <strong>wonders</strong> on execution time of running multiple <code>Prophet</code> forecasts.</p>
+</div>
+<div id="part-1-background" class="section level1">
+<h1>Part 1: Background</h1>
+<div id="what-am-i-doing" class="section level2">
+<h2>What Am I Doing?</h2>
+<p>Facebook has developed an open-source forecasting library for Python and R called <a href="https://facebook.github.io/prophet/">Prophet</a> authored by <a href="https://twitter.com/seanjtaylor">Sean J. Taylor</a>.</p>
+<p>Long story short is that this is a simple API that allows you to feed it a two-column timeseries, and it will generate a forecast for you. The dataset required is simple, just a <code>date</code> column, and then a column for pretty much any number you want. Common examples are ‘price of this thing’, or ‘revenue of my business’.</p>
+<p>They recently upgraded to version 0.4</p>
+{{% tweet "1076176804790947840" %}}
+<p>And this reminded me of a cool animation I made for myself to better understand what one of the inputs <code>changepoint.prior.scale</code> was actually doing.</p>
+<p>Inspired by another writeup from <a href="http://lenkiefer.com/2017/08/10/animation-progress/">Len Keifer</a>, I figured an animated time-series would give me a good idea for comparing different outputs when I toggled this parameter. The below writeup is the process I went through to generate the gif at the top of this post.</p>
+<hr />
+</div>
+</div>
+<div id="part-2-fetching-a-good-time-series-example-dataset" class="section level1">
+<h1>Part 2: Fetching A Good Time-Series Example Dataset</h1>
+<p>My <a href="http://peakmaximum.com/2017/12/05/indexed-time-series-changes/">earlier post</a> on time-series changes used wikipedia pageviews of various footballers to try and demonstrate how to adjust time-series analysis for magnitude differences in values. We <strong>could try</strong> to use that same dataset to feed into Prophet and have it spit out some forecasts as well, however we probably need pages with a bit more volume than that. Fortunately the <code>pageviews</code> packages has the <code>project_pageviews</code> function that will give us aggregated pageviews for the whole ‘<a href="https://en.wikipedia.org" class="uri">https://en.wikipedia.org</a>’ site.</p>
+<pre class="r"><code>library( &#39;pageviews&#39;)
+library( &#39;dplyr&#39;)
+library( &#39;magrittr&#39;)
+
+trend_data &lt;-
+  project_pageviews(
+    project = &quot;en.wikipedia&quot;,
+    end = as.Date(&quot;2019-01-01&quot;),
+    user_type=&quot;user&quot;
+  )</code></pre>
+<pre class="r"><code>library( &#39;ggplot2&#39;)
+library( &#39;scales&#39;)
+library( &#39;ggthemr&#39;)
+
+ggthemr::ggthemr(palette=&#39;flat&#39;, type=&#39;outer&#39;)
+
+ggplot(
+  trend_data
+  , aes(x=date, y = views / 1e6)
+) +
+  geom_line() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = &#39;en.wikipedia.org Views (MM) by Day&#39;
+    , subtitle = glue::glue(&#39;From {min(trend_data$date)} to {max(trend_data$date)}&#39;)
+    , x = element_blank()
+    , y = element_blank()
+    ) +
+  theme(
+    legend.position = &#39;top&#39;
+    , legend.title = element_blank()
+    )</code></pre>
+<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<hr />
+</div>
+<div id="part-3-forecasting-with-prophet" class="section level1">
+<h1>Part 3: Forecasting With Prophet</h1>
+<p>Prophet is relatively straightforward by default. You simply pass it a dataframe with a date and a number, and it gives you a forecast. Using this <a href="https://facebook.github.io/prophet/docs/quick_start.html#r-api">doc page</a> as a guide, let’s simply feed it aggregate pageview data from our query and see what it spits out.</p>
+<pre class="r"><code>library( &#39;prophet&#39;)
+
+# prophet requires the `date` field you pass is named &#39;ds&#39; in accordance with the commonly used term within Facebook (and maybe other places) and that the numeric variable is called &#39;y&#39;.
+
+input &lt;- trend_data %&gt;%
+  rename(
+    ds = date,
+    y = views
+  ) %&gt;%
+  select(ds,y)
+
+str(input)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    1178 obs. of  2 variables:
+##  $ ds: POSIXct, format: &quot;2015-10-01&quot; &quot;2015-10-02&quot; ...
+##  $ y : num  2.39e+08 2.34e+08 2.21e+08 2.44e+08 2.60e+08 ...</code></pre>
+<div id="step-1-use-prophet-on-your-input-dataframe-to-generate-a-model" class="section level2">
+<h2>Step 1: use <code>prophet()</code> on your input dataframe to generate a model</h2>
+<pre class="r"><code>m &lt;- prophet(input)</code></pre>
+<pre><code>## Initial log joint probability = -6.91442
+## Optimization terminated normally: 
+##   Convergence detected: relative gradient magnitude is below tolerance</code></pre>
+</div>
+<div id="step-2-generate-a-new-dataframe-with-dates-from-the-future-that-you-will-be-forecasting" class="section level2">
+<h2>Step 2: Generate a new dataframe with dates from the future that you will be forecasting</h2>
+<pre class="r"><code>future &lt;- make_future_dataframe(m, periods = 365)
+tail(future)</code></pre>
+<pre><code>##              ds
+## 1538 2019-12-16
+## 1539 2019-12-17
+## 1540 2019-12-18
+## 1541 2019-12-19
+## 1542 2019-12-20
+## 1543 2019-12-21</code></pre>
+</div>
+<div id="step-3-use-prophets-predict-function-topredict." class="section level2">
+<h2>Step 3: Use Prophet’s <code>predict()</code> function to…predict.</h2>
+<p>It spits out fancy names like yhat because science. <code>yhat</code> just means the predicted value. It is what you’re looking for if you’ve gotten this far. It provides some confidence intervals in the form of <code>yhat_upper</code> and <code>yhat_lower</code>.</p>
+<pre class="r"><code>forecast &lt;- predict(m, future)
+
+tail(forecast[c(&#39;ds&#39;, &#39;yhat&#39;, &#39;yhat_lower&#39;, &#39;yhat_upper&#39;)])</code></pre>
+<pre><code>##              ds      yhat yhat_lower yhat_upper
+## 1538 2019-12-16 253006215  221604789  285178474
+## 1539 2019-12-17 244974436  215708043  275324475
+## 1540 2019-12-18 240200079  209693485  272660595
+## 1541 2019-12-19 235614690  203143762  267689061
+## 1542 2019-12-20 225454931  194897947  257614777
+## 1543 2019-12-21 219772763  187111195  252578935</code></pre>
+</div>
+<div id="step-4-visualize-the-results" class="section level2">
+<h2>Step 4: Visualize the results</h2>
+<pre class="r"><code>ggthemr::ggthemr_reset()
+plot(m, forecast)</code></pre>
+<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>You can look at seasonal components out of the box as well:</p>
+<pre class="r"><code>prophet_plot_components(m, forecast)</code></pre>
+<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>But! None of this is really why we’re here. Let’s use the power of <code>purrr</code> and <code>gganimate</code> to run a whole bunch of forecasts and check how <code>Prophet</code> performs.</p>
+<hr />
+</div>
+</div>
+<div id="part-4-using-furrr" class="section level1">
+<h1>Part 4: Using <a href="https://github.com/DavisVaughan/furrr">furrr</a></h1>
+<p>Our end goal is to generate multiple forecasts and compare the results. The problem with this is that <code>Prophet</code> forecasts take some time to generate. Not a <strong>long</strong> time, but enough time that if you want to run more than a handful, you will have time go get a hot or cold beverage of your choice and maybe a lunch and a dinner by time time they finish. To quote the <code>furrr</code> <a href="https://github.com/DavisVaughan/furrr">documentation</a>, furr “Appl(ies) Mapping Functions in Parallel using Futures”. That means stuff goes faster.</p>
+<div id="step-1-generating-backtest-data" class="section level2">
+<h2>Step 1: Generating Backtest Data</h2>
+<p>We want to run a forecast every day starting in 2017 (when we have a good history of data from 2015 and 2016) up to today (Dec 21, 2018) and then compare the results to what actually happened.</p>
+<p>To prep the data, we’ll need to generate a dataframe that has the entire history of the pageviews data up to the date that we want to run a forecast for EACH DAY that we want to forecast.</p>
+<pre class="r"><code>input$ds &lt;- as.Date(input$ds)
+
+datelist &lt;- seq(from=as.Date(&#39;2017-01-01&#39;), to=as.Date(max(input$ds)), by = &#39;day&#39;) %&gt;%
+  data.frame() %&gt;% 
+  rename(forecast_date=&#39;.&#39;) %&gt;% 
+  mutate(forecast_date = as.factor(forecast_date))
+
+historical_dates &lt;- input %&gt;%
+  mutate(ds=as.factor(ds)) %&gt;%
+  select(ds) %&gt;%
+  unique()
+
+full_dates &lt;- expand.grid(
+    datelist$forecast_date,
+    historical_dates$ds
+  ) %&gt;%
+  rename(
+    forecast_date = Var1,
+    ds = Var2
+  ) %&gt;% 
+  mutate(
+    forecast_date = as.Date(forecast_date),
+    ds = as.Date(ds)
+    )
+
+full_dates &lt;- full_dates[full_dates$forecast_date &gt;= full_dates$ds,]
+
+full_dates &lt;- full_dates %&gt;%
+  left_join(input, by=&#39;ds&#39;)</code></pre>
+<p>So we have a full history of pageviews up to Jan 1 2017:</p>
+<pre class="r"><code>full_dates %&gt;% filter(forecast_date==&#39;2017-01-01&#39;) %&gt;% tail()</code></pre>
+<pre><code>##     forecast_date         ds         y
+## 454    2017-01-01 2016-12-27 274080180
+## 455    2017-01-01 2016-12-28 274697955
+## 456    2017-01-01 2016-12-29 281605235
+## 457    2017-01-01 2016-12-30 258525316
+## 458    2017-01-01 2016-12-31 240635052
+## 459    2017-01-01 2017-01-01 257199090</code></pre>
+<p>And a full history up to every other date after Jan 1 2017. So on Dec 21 2018, we have every day up to that as well.</p>
+<pre class="r"><code>full_dates %&gt;% filter(forecast_date==&#39;2018-12-21&#39;) %&gt;% tail()</code></pre>
+<pre><code>##      forecast_date         ds         y
+## 1173    2018-12-21 2018-12-16 244933688
+## 1174    2018-12-21 2018-12-17 258270188
+## 1175    2018-12-21 2018-12-18 247192256
+## 1176    2018-12-21 2018-12-19 240800343
+## 1177    2018-12-21 2018-12-20 231354940
+## 1178    2018-12-21 2018-12-21 220120335</code></pre>
+<p>Here is where we start to do the nesting magic.</p>
+<p>We’re going to nest the history of pageviews into a single cell for each day we want to run a forecast:</p>
+<pre class="r"><code>full_dates %&lt;&gt;%
+    group_by( forecast_date) %&gt;% 
+    tidyr::nest()
+
+names(full_dates) &lt;- c(&#39;forecast_date&#39;,&#39;model_data&#39;)
+
+head(full_dates)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   forecast_date model_data        
+##   &lt;date&gt;        &lt;list&gt;            
+## 1 2017-01-01    &lt;tibble [459 × 2]&gt;
+## 2 2017-01-02    &lt;tibble [460 × 2]&gt;
+## 3 2017-01-03    &lt;tibble [461 × 2]&gt;
+## 4 2017-01-04    &lt;tibble [462 × 2]&gt;
+## 5 2017-01-05    &lt;tibble [463 × 2]&gt;
+## 6 2017-01-06    &lt;tibble [464 × 2]&gt;</code></pre>
+<p>Then we declare a function to call <code>Prophet</code>.</p>
+<pre class="r"><code>prophet_call &lt;- function(df) {
+    prophet(df)
+}</code></pre>
+<p>Then we use <code>furrr::future_map()</code> to run a forecast model for each day in our backtest.</p>
+<pre class="r"><code>library(&#39;future&#39;)
+library(&#39;purrr&#39;)
+library(&#39;furrr&#39;)
+
+future::plan(multiprocess)
+full_dates %&lt;&gt;%
+  mutate(
+    model = furrr::future_map(
+      model_data,
+      possibly( prophet_call, NA)),
+      err = purrr::map_lgl( model, is.logical)
+    )</code></pre>
+<p>This gives us a forecast model for every single day in the ‘model’ field.</p>
+<pre class="r"><code>head(full_dates)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   forecast_date model_data         model         err  
+##   &lt;date&gt;        &lt;list&gt;             &lt;list&gt;        &lt;lgl&gt;
+## 1 2017-01-01    &lt;tibble [459 × 2]&gt; &lt;S3: prophet&gt; FALSE
+## 2 2017-01-02    &lt;tibble [460 × 2]&gt; &lt;S3: prophet&gt; FALSE
+## 3 2017-01-03    &lt;tibble [461 × 2]&gt; &lt;S3: prophet&gt; FALSE
+## 4 2017-01-04    &lt;tibble [462 × 2]&gt; &lt;S3: prophet&gt; FALSE
+## 5 2017-01-05    &lt;tibble [463 × 2]&gt; &lt;S3: prophet&gt; FALSE
+## 6 2017-01-06    &lt;tibble [464 × 2]&gt; &lt;S3: prophet&gt; FALSE</code></pre>
+<p>We can now use that model to predict on. This part will take some time, it is running about two years of forecasts. One forecast per day.</p>
+<pre class="r"><code># Create empty future dataframe and predict
+plan(multiprocess)
+full_dates &lt;- full_dates %&gt;%
+  dplyr::filter(err==F) %&gt;%
+  dplyr::mutate(
+    future = purrr::map(model, ~make_future_dataframe(., periods = 365))
+    , future = furrr::future_map2(model, future, predict)
+  )</code></pre>
+<p>That will run for a while and then output the forecast prediction values to the column we called <code>future</code>.</p>
+<p>In this example, we ran a different forecast for a whole bunch of <strong>days</strong> in the past for backtesting purposes, but you can do this type of thing on the same day and for a bunch of <strong>countries</strong> for example.</p>
+<hr />
+</div>
+</div>
+<div id="part-5-plotting-the-results-with-gganimate" class="section level1">
+<h1>Part 5: Plotting The Results with gganimate</h1>
+<div id="step-1-view-the-output" class="section level2">
+<h2>Step 1: View the output</h2>
+<p>Let’s unnest the data and look at an example date of Jan. 1 2017</p>
+<pre class="r"><code>forecast_df &lt;- full_dates %&gt;%
+    filter(forecast_date == &#39;2017-01-01&#39;) %&gt;% 
+    select(forecast_date, future) %&gt;%
+    tidyr::unnest() %&gt;%
+    select(forecast_date, ds, yhat, yhat_upper, yhat_lower) %&gt;% 
+    mutate(ds=as.Date(ds)) %&gt;% 
+    left_join(input, by=&#39;ds&#39;)
+
+ggthemr::ggthemr(palette=&#39;flat&#39;, type = &#39;outer&#39;, layout=&#39;clean&#39;)
+
+ggplot(
+  forecast_df %&gt;%
+    filter(ds &gt;= &#39;2017-01-01&#39;, ds &lt;= &#39;2017-03-31&#39;)
+  , aes(
+    x = ds
+  )
+) +
+  geom_line(
+    data = forecast_df %&gt;% filter(ds &gt;= &#39;2016-12-01&#39;, ds &lt;= &#39;2017-01-01&#39;)
+    , aes( y = y/1e6, color = &#39;Input&#39;, linetype=&quot;Input&quot;)
+    ) +
+  geom_line(
+    data = forecast_df %&gt;% filter(ds &gt;= &#39;2017-01-01&#39;, ds &lt;= &#39;2017-03-31&#39;)
+    , aes( y = yhat/1e6, color = &#39;Forecast&#39;, linetype=&#39;Forecast&#39;)
+  ) +
+  geom_line(
+    data = forecast_df %&gt;% filter(ds &gt;= &#39;2017-01-01&#39;, ds &lt;= &#39;2017-03-31&#39;)
+    , aes( y = y/1e6, color = &#39;Actual&#39;, linetype=&quot;Actual&quot;)
+    ) +
+  scale_color_manual(&quot;&quot;, values=c(&quot;Input&quot;=&quot;black&quot;, &quot;Forecast&quot;=&quot;tomato&quot;, &quot;Actual&quot; = &quot;blue&quot;), guide = guide_legend(reverse=TRUE)) +
+  scale_linetype_manual(&quot;&quot;, values=c(&quot;Input&quot;=1, &quot;Forecast&quot;=2, &quot;Actual&quot; = 3), guide = guide_legend(reverse=TRUE)) +
+  labs(title=&quot;Wikipedia Daily Pageiews Forecast as of Jan. 1 2017&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
+  theme(legend.position=&#39;top&#39;)</code></pre>
+<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>We also have a forecast generated using data up to January 1 <strong>2018</strong></p>
+<pre class="r"><code>forecast_df &lt;- full_dates %&gt;%
+    filter(forecast_date == &#39;2018-01-01&#39;) %&gt;% 
+    select(forecast_date, future) %&gt;%
+    tidyr::unnest() %&gt;%
+    select(forecast_date, ds, yhat, yhat_upper, yhat_lower) %&gt;% 
+    mutate(ds=as.Date(ds)) %&gt;% 
+    left_join(input, by=&#39;ds&#39;)
+
+ggthemr::ggthemr(palette=&#39;flat&#39;, type = &#39;outer&#39;, layout=&#39;clean&#39;)
+
+ggplot(
+  forecast_df %&gt;%
+    filter(ds &gt;= &#39;2018-01-01&#39;, ds &lt;= &#39;2018-03-31&#39;)
+  , aes(
+    x = ds
+  )
+) +
+  geom_line(
+    data = forecast_df %&gt;% filter(ds &gt;= &#39;2017-12-01&#39;, ds &lt;= &#39;2018-01-01&#39;)
+    , aes( y = y/1e6, color = &#39;Input&#39;, linetype=&quot;Input&quot;)
+    ) +
+  geom_line(
+    data = forecast_df %&gt;% filter(ds &gt;= &#39;2018-01-01&#39;, ds &lt;= &#39;2018-03-31&#39;)
+    , aes( y = yhat/1e6, color = &#39;Forecast&#39;, linetype=&#39;Forecast&#39;)
+  ) +
+  geom_line(
+    data = forecast_df %&gt;% filter(ds &gt;= &#39;2018-01-01&#39;, ds &lt;= &#39;2018-03-31&#39;)
+    , aes( y = y/1e6, color = &#39;Actual&#39;, linetype=&quot;Actual&quot;)
+    ) +
+  scale_color_manual(&quot;&quot;, values=c(&quot;Input&quot;=&quot;black&quot;, &quot;Forecast&quot;=&quot;tomato&quot;, &quot;Actual&quot; = &quot;blue&quot;), guide = guide_legend(reverse=TRUE)) +
+  scale_linetype_manual(&quot;&quot;, values=c(&quot;Input&quot;=1, &quot;Forecast&quot;=2, &quot;Actual&quot; = 3), guide = guide_legend(reverse=TRUE)) +
+  labs(title=&quot;Wikipedia Daily Pageiews Forecast as of Jan. 1 2017&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
+  theme(legend.position=&#39;top&#39;)</code></pre>
+<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>You can see this <strong>appears</strong> to be more accurate. This would support the case that <code>Prophet</code> performs better now that it had more data to train on (a full year more!).</p>
+</div>
+<div id="step-2-calculate-the-error-rates" class="section level2">
+<h2>Step 2: Calculate the Error Rates</h2>
+<p>So let’s calculate the error rates of our forecasts by day. To keep things simple let’s just do the 30-day error rates and define our error as the MAPE (Mean Absolute Percent Error). This is just a fancy acronym to say “divide the error by the actual and state it in absolute terms”. So e.g. if you’re off by 5% high or low every day on average in the 30-days following your forecast, your 30-day MAPE is 5%</p>
+<pre class="r"><code>forecast_df &lt;- full_dates %&gt;%
+    select(forecast_date, future) %&gt;%
+    tidyr::unnest() %&gt;%
+    select(forecast_date, ds, yhat) %&gt;% 
+    mutate(ds=as.Date(ds)) %&gt;% 
+    left_join(input, by=&#39;ds&#39;)
+
+error_df &lt;- forecast_df %&gt;% 
+  group_by( forecast_date) %&gt;% 
+  arrange( ds) %&gt;% 
+  mutate(
+    in_error_window = between( ds - forecast_date, 1, 30)
+    , error = abs( ifelse( in_error_window, yhat/y-1, NA))
+  ) %&gt;% 
+  group_by( forecast_date, in_error_window) %&gt;% 
+  mutate(
+    mape_30d = mean(error)
+  ) %&gt;% 
+  ungroup() %&gt;%
+  filter(in_error_window) %&gt;% 
+  group_by(forecast_date) %&gt;% 
+  summarise(mape_30d = max(mape_30d))
+
+ggplot(
+  error_df
+  , aes(x=forecast_date, y = mape_30d)
+) +
+  geom_line() +
+  labs(title=&quot;Prophet&#39;s 30d MAPE on en.wikipedia.org Pageviews&quot;) +
+  scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
+  scale_x_date(date_breaks = &#39;1 months&#39;, date_labels = &#39;%b %y&#39;) +
+  theme(axis.text.x = element_text(angle=45, hjust=1), axis.title=element_blank(), panel.grid.major = element_line(color=&#39;grey&#39;,linetype=2))</code></pre>
+<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="step-3-make-a-pretty-gif-of-this-with-gganimate" class="section level2">
+<h2>Step 3: Make A Pretty gif Of This With gganimate</h2>
+<p>Now let’s make a gif of our forecast through time, partitioned by the <code>forecast_date</code> field!</p>
+<pre class="r"><code>library(&#39;gganimate&#39;)
+forecast_df &lt;- forecast_df %&gt;% group_by(forecast_date)
+
+ggthemr::ggthemr(palette=&#39;fresh&#39;, type = &#39;outer&#39;)
+# ggthemr::ggthemr_reset()
+
+forecast_plot &lt;- ggplot(
+  forecast_df %&gt;% filter(ds &gt;= &#39;2018-01-01&#39;, ds &lt;= forecast_date + 365, forecast_date &gt;= &#39;2018-01-01&#39;)
+  , aes(
+    x = ds
+  )
+) +
+  geom_line(
+    aes( y = yhat/1e6, group=forecast_date)
+    , color = &#39;tomato&#39;
+    , linetype = 2
+    , alpha=0.3
+  ) +
+  geom_line(
+    data = forecast_df %&gt;% filter(ds &gt;= &#39;2018-01-01&#39;, ds &lt;= forecast_date, forecast_date &gt;= &#39;2018-01-01&#39;)
+    , aes( y = y/1e6, group=forecast_date)
+    ) +
+  transition_time(forecast_date) +
+  ease_aes(&#39;linear&#39;) +
+  labs(
+    title = &#39;Wikipedia Page Views Forecast as of Date: {frame_time}&#39;
+    , subtitle=&#39;Pageviews in Millions&#39;
+    , x = element_blank()
+    , y = element_blank()
+    )
+
+anim_save(filename=&quot;~/Documents/peakmaximum/static/img/forecast_plot.fib&quot;, animation = forecast_plot)</code></pre>
+<p><img src="/img/forecast_plot.gif" width="300px" style="display: block; margin: auto;" /></p>
+</div>
+</div>

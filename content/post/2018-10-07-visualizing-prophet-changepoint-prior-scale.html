@@ -1,5 +1,5 @@
 ---
-title: Visualizing Prophet Forecasts (And Errors) with furrr, and gganimate
+title: Visualizing Prophet Forecasts (And Errors) with purrr, and gganimate
 author: porter
 date: '2018-12-22'
 slug: visualizing-prophet-with-gganimate
@@ -14,7 +14,7 @@ keywords: ['rstats','prophet','forecasting','gifs','dataviz','visualization','gg
 <p><img src="/img/forecast_plot.gif" width="300px" style="display: block; margin: auto;" /></p>
 <div id="credit-where-credit-is-due" class="section level1">
 <h1>Credit Where Credit is Due</h1>
-<p>The idea and methods of using <code>furrr</code> with <code>Prophet</code> here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which works absolute <strong>wonders</strong> on execution time of running multiple <code>Prophet</code> forecasts.</p>
+<p>The idea and methods of using <code>purrr</code> with <code>Prophet</code> here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which leverages <code>map()</code> functions to more cleanly structure our input data and apply the forecast function over it many times.</p>
 </div>
 <div id="part-1-background" class="section level1">
 <h1>Part 1: Background</h1>
@@ -24,8 +24,7 @@ keywords: ['rstats','prophet','forecasting','gifs','dataviz','visualization','gg
 <p>Long story short is that this is a simple API that allows you to feed it a two-column timeseries, and it will generate a forecast for you. The dataset required is simple, just a <code>date</code> column, and then a column for pretty much any number you want. Common examples are ‘price of this thing’, or ‘revenue of my business’.</p>
 <p>They recently upgraded to version 0.4</p>
 {{% tweet "1076176804790947840" %}}
-<p>And this reminded me of a cool animation I made for myself to better understand what one of the inputs <code>changepoint.prior.scale</code> was actually doing.</p>
-<p>Inspired by another writeup from <a href="http://lenkiefer.com/2017/08/10/animation-progress/">Len Keifer</a>, I figured an animated time-series would give me a good idea for comparing different outputs when I toggled this parameter. The below writeup is the process I went through to generate the gif at the top of this post.</p>
+<p>Inspired by another writeup from <a href="http://lenkiefer.com/2017/08/10/animation-progress/">Len Keifer</a>, I figured an animated time-series would be a good use-case for showing how Prophet’s forecasts change through time as new data is added. The below writeup is the process I went through to generate the gif at the top of this post.</p>
 <hr />
 </div>
 </div>
@@ -106,7 +105,7 @@ tail(future)</code></pre>
 </div>
 <div id="step-3-use-prophets-predict-function-topredict." class="section level2">
 <h2>Step 3: Use Prophet’s <code>predict()</code> function to…predict.</h2>
-<p>It spits out fancy names like yhat because science. <code>yhat</code> just means the predicted value. It is what you’re looking for if you’ve gotten this far. It provides some confidence intervals in the form of <code>yhat_upper</code> and <code>yhat_lower</code>.</p>
+<p><code>predict()</code> spits out fancy names like “yhat” because science. “yhat” just means the predicted value. Predict also provides some confidence intervals in the form of <code>yhat_upper</code> and <code>yhat_lower</code> fields.</p>
 <pre class="r"><code>forecast &lt;- predict(m, future)
 
 tail(forecast[c(&#39;ds&#39;, &#39;yhat&#39;, &#39;yhat_lower&#39;, &#39;yhat_upper&#39;)])</code></pre>
@@ -132,7 +131,7 @@ plot(m, forecast)</code></pre>
 </div>
 <div id="part-4-using-furrr" class="section level1">
 <h1>Part 4: Using <a href="https://github.com/DavisVaughan/furrr">furrr</a></h1>
-<p>Our end goal is to generate multiple forecasts and compare the results. The problem with this is that <code>Prophet</code> forecasts take some time to generate. Not a <strong>long</strong> time, but enough time that if you want to run more than a handful, you will have time go get a hot or cold beverage of your choice and maybe a lunch and a dinner by time time they finish. To quote the <code>furrr</code> <a href="https://github.com/DavisVaughan/furrr">documentation</a>, furr “Appl(ies) Mapping Functions in Parallel using Futures”. That means stuff goes faster.</p>
+<p>Our end goal is to generate multiple forecasts and compare the results. The problem with this is that <code>Prophet</code> forecasts take some time to generate. Not a <strong>long</strong> time, but enough time that if you want to run more than a handful, you will have time go get a hot or cold beverage of your choice and maybe a lunch and a dinner by time time they finish. To quote the <code>furrr</code> <a href="https://github.com/DavisVaughan/furrr">documentation</a>, furr “Appl(ies) Mapping Functions in Parallel using Futures”. That means stuff may go faster if we use <code>furrr</code>.</p>
 <div id="step-1-generating-backtest-data" class="section level2">
 <h2>Step 1: Generating Backtest Data</h2>
 <p>We want to run a forecast every day starting in 2017 (when we have a good history of data from 2015 and 2016) up to today (Dec 21, 2018) and then compare the results to what actually happened.</p>
@@ -206,7 +205,7 @@ head(full_dates)</code></pre>
 <pre class="r"><code>prophet_call &lt;- function(df) {
     prophet(df)
 }</code></pre>
-<p>Then we use <code>furrr::future_map()</code> to run a forecast model for each day in our backtest.</p>
+<p>Then we use <code>furrr::future_map()</code> to run a forecast model for each day in our backtest. The ‘possibly’ call allows us to do avoid error failures.</p>
 <pre class="r"><code>library(&#39;future&#39;)
 library(&#39;purrr&#39;)
 library(&#39;furrr&#39;)
@@ -283,7 +282,7 @@ ggplot(
   labs(title=&quot;Wikipedia Daily Pageiews Forecast as of Jan. 1 2017&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
   theme(legend.position=&#39;top&#39;)</code></pre>
 <p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>We also have a forecast generated using data up to January 1 <strong>2018</strong></p>
+<p>We also have a <strong>separate</strong> forecast that was generated using data up to January 1 <strong>2018</strong>.</p>
 <pre class="r"><code>forecast_df &lt;- full_dates %&gt;%
     filter(forecast_date == &#39;2018-01-01&#39;) %&gt;% 
     select(forecast_date, future) %&gt;%
@@ -322,7 +321,7 @@ ggplot(
 </div>
 <div id="step-2-calculate-the-error-rates" class="section level2">
 <h2>Step 2: Calculate the Error Rates</h2>
-<p>So let’s calculate the error rates of our forecasts by day. To keep things simple let’s just do the 30-day error rates and define our error as the MAPE (Mean Absolute Percent Error). This is just a fancy acronym to say “divide the error by the actual and state it in absolute terms”. So e.g. if you’re off by 5% high or low every day on average in the 30-days following your forecast, your 30-day MAPE is 5%</p>
+<p>So let’s calculate the error rates of our forecasts by day. To keep things simple let’s just do the 30-day error rates and define our error as the MAPE (Mean Absolute Percent Error). This is just a fancy acronym to say “divide the predicted value by what actually happened and then state it in absolute terms”. So e.g. if you’re off by 5% high or low every day on average in the 30-days following your forecast, your 30-day MAPE is 5%.</p>
 <pre class="r"><code>forecast_df &lt;- full_dates %&gt;%
     select(forecast_date, future) %&gt;%
     tidyr::unnest() %&gt;%

@@ -12,12 +12,12 @@
     
     
     <item>
-      <title>Visualizing Prophet Forecasts (And Errors) with furrr, and gganimate</title>
+      <title>Visualizing Prophet Forecasts (And Errors) with purrr, and gganimate</title>
       <link>/2018/12/22/visualizing-prophet-with-gganimate/</link>
       <pubDate>Sat, 22 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>/2018/12/22/visualizing-prophet-with-gganimate/</guid>
-      <description>Credit Where Credit is Due The idea and methods of using furrr with Prophet here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which works absolute wonders on execution time of running multiple Prophet forecasts.
+      <description>Credit Where Credit is Due The idea and methods of using purrr with Prophet here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which leverages map() functions to more cleanly structure our input data and apply the forecast function over it many times.
  Part 1: Background What Am I Doing? Facebook has developed an open-source forecasting library for Python and R called Prophet authored by Sean J.</description>
     </item>
     

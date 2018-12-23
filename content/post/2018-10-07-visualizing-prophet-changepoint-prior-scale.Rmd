@@ -1,5 +1,5 @@
 ---
-title: Visualizing Prophet Forecasts (And Errors) with furrr, and gganimate
+title: Visualizing Prophet Forecasts (And Errors) with purrr, and gganimate
 author: porter
 date: '2018-12-22'
 slug: visualizing-prophet-with-gganimate
@@ -28,7 +28,7 @@ knitr::include_graphics("/img/forecast_plot.gif")
 ```
 
 # Credit Where Credit is Due
-The idea and methods of using `furrr` with `Prophet` here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which works absolute **wonders** on execution time of running multiple `Prophet` forecasts.
+The idea and methods of using `purrr` with `Prophet` here were not my own. I copied this methodology from a coworker who was kind enough to share this approach below which leverages `map()` functions to more cleanly structure our input data and apply the forecast function over it many times.
 
 # Part 1: Background
 
@@ -44,9 +44,7 @@ They recently upgraded to version 0.4
 blogdown::shortcode('tweet', '1076176804790947840')
 ```
 
-And this reminded me of a cool animation I made for myself to better understand what one of the inputs `changepoint.prior.scale` was actually doing.
-
-Inspired by another writeup from [Len Keifer](http://lenkiefer.com/2017/08/10/animation-progress/), I figured an animated time-series would give me a good idea for comparing different outputs when I toggled this parameter. The below writeup is the process I went through to generate the gif at the top of this post.
+Inspired by another writeup from [Len Keifer](http://lenkiefer.com/2017/08/10/animation-progress/), I figured an animated time-series would be a good use-case for showing how Prophet's forecasts change through time as new data is added. The below writeup is the process I went through to generate the gif at the top of this post.
 
 ----
 
@@ -136,7 +134,7 @@ tail(future)
 
 ## Step 3: Use Prophet's `predict()` function to...predict.
 
-It spits out fancy names like yhat because science. `yhat` just means the predicted value. It is what you're looking for if you've gotten this far. It provides some confidence intervals in the form of `yhat_upper` and `yhat_lower`.
+`predict()` spits out fancy names like "yhat" because science. "yhat" just means the predicted value. Predict also provides some confidence intervals in the form of `yhat_upper` and `yhat_lower` fields.
 
 ```{r}
 
@@ -165,7 +163,7 @@ But! None of this is really why we're here. Let's use the power of `purrr` and `
 
 #Part 4: Using [furrr](https://github.com/DavisVaughan/furrr)
 
-Our end goal is to generate multiple forecasts and compare the results. The problem with this is that `Prophet` forecasts take some time to generate. Not a **long** time, but enough time that if you want to run more than a handful, you will have time go get a hot or cold beverage of your choice and maybe a lunch and a dinner by time time they finish. To quote the `furrr` [documentation](https://github.com/DavisVaughan/furrr), furr "Appl(ies) Mapping Functions in Parallel using Futures". That means stuff goes faster.
+Our end goal is to generate multiple forecasts and compare the results. The problem with this is that `Prophet` forecasts take some time to generate. Not a **long** time, but enough time that if you want to run more than a handful, you will have time go get a hot or cold beverage of your choice and maybe a lunch and a dinner by time time they finish. To quote the `furrr` [documentation](https://github.com/DavisVaughan/furrr), furr "Appl(ies) Mapping Functions in Parallel using Futures". That means stuff may go faster if we use `furrr`.
 
 ## Step 1: Generating Backtest Data
 
@@ -245,7 +243,7 @@ prophet_call <- function(df) {
 
 ```
 
-Then we use `furrr::future_map()` to run a forecast model for each day in our backtest.
+Then we use `furrr::future_map()` to run a forecast model for each day in our backtest. The 'possibly' call allows us to do avoid error failures.
 
 ```{r eval=FALSE, echo=TRUE}
 library('future')
@@ -348,7 +346,7 @@ ggplot(
 
 ```
 
-We also have a forecast generated using data up to January 1 **2018**
+We also have a **separate** forecast that was generated using data up to January 1 **2018**.
 
 ```{r}
 
@@ -392,7 +390,7 @@ You can see this **appears** to be more accurate. This would support the case th
 
 ## Step 2: Calculate the Error Rates
 
-So let's calculate the error rates of our forecasts by day. To keep things simple let's just do the 30-day error rates and define our error as the MAPE (Mean Absolute Percent Error). This is just a fancy acronym to say "divide the error by the actual and state it in absolute terms". So e.g. if you're off by 5% high or low every day on average in the 30-days following your forecast, your 30-day MAPE is 5%
+So let's calculate the error rates of our forecasts by day. To keep things simple let's just do the 30-day error rates and define our error as the MAPE (Mean Absolute Percent Error). This is just a fancy acronym to say "divide the predicted value by what actually happened and then state it in absolute terms". So e.g. if you're off by 5% high or low every day on average in the 30-days following your forecast, your 30-day MAPE is 5%.
 
 ```{r}
 

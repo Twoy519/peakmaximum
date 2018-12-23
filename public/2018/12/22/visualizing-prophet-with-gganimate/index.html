@@ -378,7 +378,7 @@ ggplot(
     ) +
   scale_color_manual(&quot;&quot;, values=c(&quot;Input&quot;=&quot;black&quot;, &quot;Forecast&quot;=&quot;tomato&quot;, &quot;Actual&quot; = &quot;blue&quot;), guide = guide_legend(reverse=TRUE)) +
   scale_linetype_manual(&quot;&quot;, values=c(&quot;Input&quot;=1, &quot;Forecast&quot;=2, &quot;Actual&quot; = 3), guide = guide_legend(reverse=TRUE)) +
-  labs(title=&quot;Wikipedia Daily Pageiews Forecast as of Jan. 1 2017&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
+  labs(title=&quot;Wikipedia Daily Pageviews Forecast as of Jan. 1 **2018**&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
   theme(legend.position=&#39;top&#39;)</code></pre>
 <p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>You can see this <strong>appears</strong> to be more accurate. This would support the case that <code>Prophet</code> performs better now that it had more data to train on (a full year more!).</p>

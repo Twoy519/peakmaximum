@@ -381,7 +381,7 @@ ggplot(
     ) +
   scale_color_manual("", values=c("Input"="black", "Forecast"="tomato", "Actual" = "blue"), guide = guide_legend(reverse=TRUE)) +
   scale_linetype_manual("", values=c("Input"=1, "Forecast"=2, "Actual" = 3), guide = guide_legend(reverse=TRUE)) +
-  labs(title="Wikipedia Daily Pageiews Forecast as of Jan. 1 2017", subtitle='Pageviews in Millions',x = element_blank(), y=element_blank()) +
+  labs(title="Wikipedia Daily Pageviews Forecast as of Jan. 1 **2018**", subtitle='Pageviews in Millions',x = element_blank(), y=element_blank()) +
   theme(legend.position='top')
 
 ```

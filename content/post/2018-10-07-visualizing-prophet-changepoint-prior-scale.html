@@ -391,13 +391,13 @@ forecast_plot &lt;- ggplot(
   transition_time(forecast_date) +
   ease_aes(&#39;linear&#39;) +
   labs(
-    title = &#39;Wikipedia Page Views Forecast as of Date: {frame_time}&#39;
+    title = &#39;Wikipedia Pageviews Forecast as of Date: {frame_time}&#39;
     , subtitle=&#39;Pageviews in Millions&#39;
     , x = element_blank()
     , y = element_blank()
     )
 
-gganimate::animate(forecast_plot, width = 800, height = 600)</code></pre>
+gganimate::animate(forecast_plot, width = 800, height = 450)</code></pre>
 <p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-23-1.gif" style="display: block; margin: auto;" /></p>
 </div>
 </div>

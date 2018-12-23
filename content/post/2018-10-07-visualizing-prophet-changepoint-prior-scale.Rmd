@@ -473,6 +473,6 @@ forecast_plot <- ggplot(
     , y = element_blank()
     )
 
-gganimate::animate(forecast_plot, width = 800, height = 600)
+gganimate::animate(forecast_plot, width = 800, height = 450)
 
 ```

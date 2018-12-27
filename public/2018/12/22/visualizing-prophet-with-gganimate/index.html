@@ -127,7 +127,7 @@ ggplot(
     legend.position = &#39;top&#39;
     , legend.title = element_blank()
     )</code></pre>
-<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <hr />
 </div>
 <div id="part-3-forecasting-with-prophet" class="section level1">
@@ -145,13 +145,13 @@ input &lt;- trend_data %&gt;%
   select(ds,y)
 
 str(input)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    1178 obs. of  2 variables:
+<pre><code>## &#39;data.frame&#39;:    1183 obs. of  2 variables:
 ##  $ ds: POSIXct, format: &quot;2015-10-01&quot; &quot;2015-10-02&quot; ...
 ##  $ y : num  2.39e+08 2.34e+08 2.21e+08 2.44e+08 2.60e+08 ...</code></pre>
 <div id="step-1-use-prophet-on-your-input-dataframe-to-generate-a-model" class="section level2">
 <h2>Step 1: use <code>prophet()</code> on your input dataframe to generate a model</h2>
 <pre class="r"><code>m &lt;- prophet(input)</code></pre>
-<pre><code>## Initial log joint probability = -6.91442
+<pre><code>## Initial log joint probability = -4.32426
 ## Optimization terminated normally: 
 ##   Convergence detected: relative gradient magnitude is below tolerance</code></pre>
 </div>
@@ -160,12 +160,12 @@ str(input)</code></pre>
 <pre class="r"><code>future &lt;- make_future_dataframe(m, periods = 365)
 tail(future)</code></pre>
 <pre><code>##              ds
-## 1538 2019-12-16
-## 1539 2019-12-17
-## 1540 2019-12-18
-## 1541 2019-12-19
-## 1542 2019-12-20
-## 1543 2019-12-21</code></pre>
+## 1543 2019-12-21
+## 1544 2019-12-22
+## 1545 2019-12-23
+## 1546 2019-12-24
+## 1547 2019-12-25
+## 1548 2019-12-26</code></pre>
 </div>
 <div id="step-3-use-prophets-predict-function-topredict." class="section level2">
 <h2>Step 3: Use Prophet’s <code>predict()</code> function to…predict.</h2>
@@ -174,21 +174,21 @@ tail(future)</code></pre>
 
 tail(forecast[c(&#39;ds&#39;, &#39;yhat&#39;, &#39;yhat_lower&#39;, &#39;yhat_upper&#39;)])</code></pre>
 <pre><code>##              ds      yhat yhat_lower yhat_upper
-## 1538 2019-12-16 253006215  221604789  285178474
-## 1539 2019-12-17 244974436  215708043  275324475
-## 1540 2019-12-18 240200079  209693485  272660595
-## 1541 2019-12-19 235614690  203143762  267689061
-## 1542 2019-12-20 225454931  194897947  257614777
-## 1543 2019-12-21 219772763  187111195  252578935</code></pre>
+## 1543 2019-12-21 215831216  186602926  247437319
+## 1544 2019-12-22 234981104  204770394  264235377
+## 1545 2019-12-23 247539297  216850786  280548852
+## 1546 2019-12-24 240706024  209992206  272511944
+## 1547 2019-12-25 237249932  208611900  268305270
+## 1548 2019-12-26 233935735  202597517  264565582</code></pre>
 </div>
 <div id="step-4-visualize-the-results" class="section level2">
 <h2>Step 4: Visualize the results</h2>
 <pre class="r"><code>ggthemr::ggthemr_reset()
 plot(m, forecast)</code></pre>
-<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>You can look at seasonal components out of the box as well:</p>
 <pre class="r"><code>prophet_plot_components(m, forecast)</code></pre>
-<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>But! None of this is really why we’re here. Let’s use the power of <code>purrr</code> and <code>gganimate</code> to run a whole bunch of forecasts and check how <code>Prophet</code> performs.</p>
 <hr />
 </div>
@@ -345,7 +345,7 @@ ggplot(
   scale_linetype_manual(&quot;&quot;, values=c(&quot;Input&quot;=1, &quot;Forecast&quot;=2, &quot;Actual&quot; = 3), guide = guide_legend(reverse=TRUE)) +
   labs(title=&quot;Wikipedia Daily Pageviews Forecast as of Jan. 1 2017&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
   theme(legend.position=&#39;top&#39;)</code></pre>
-<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>We also have a <strong>separate</strong> forecast that was generated using data up to January 1 <strong>2018</strong>.</p>
 <pre class="r"><code>forecast_df &lt;- full_dates %&gt;%
     filter(forecast_date == &#39;2018-01-01&#39;) %&gt;% 
@@ -380,7 +380,7 @@ ggplot(
   scale_linetype_manual(&quot;&quot;, values=c(&quot;Input&quot;=1, &quot;Forecast&quot;=2, &quot;Actual&quot; = 3), guide = guide_legend(reverse=TRUE)) +
   labs(title=&quot;Wikipedia Daily Pageviews Forecast as of Jan. 1 **2018**&quot;, subtitle=&#39;Pageviews in Millions&#39;,x = element_blank(), y=element_blank()) +
   theme(legend.position=&#39;top&#39;)</code></pre>
-<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>You can see this <strong>appears</strong> to be more accurate. This would support the case that <code>Prophet</code> performs better now that it had more data to train on (a full year more!).</p>
 </div>
 <div id="step-2-calculate-the-error-rates" class="section level2">
@@ -418,7 +418,7 @@ ggplot(
   scale_y_continuous(labels = scales::percent_format(accuracy=1)) +
   scale_x_date(date_breaks = &#39;1 months&#39;, date_labels = &#39;%b %y&#39;) +
   theme(axis.text.x = element_text(angle=45, hjust=1), axis.title=element_blank(), panel.grid.major = element_line(color=&#39;grey&#39;,linetype=2))</code></pre>
-<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="step-3-make-a-pretty-gif-of-this-with-gganimate" class="section level2">
 <h2>Step 3: Make A Pretty gif Of This With gganimate</h2>
@@ -462,7 +462,7 @@ forecast_plot &lt;- ggplot(
     )
 
 gganimate::animate(forecast_plot, width = 800, height = 450)</code></pre>
-<p><img src="/post/2018-10-07-visualizing-prophet-changepoint-prior-scale_files/figure-html/unnamed-chunk-23-1.gif" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-23-1.gif" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 

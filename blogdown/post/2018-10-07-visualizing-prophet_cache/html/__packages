@@ -1,0 +1,15 @@
+base
+pageviews
+dplyr
+magrittr
+ggplot2
+scales
+ggthemr
+Rcpp
+rlang
+prophet
+bindrcpp
+future
+purrr
+furrr
+gganimate

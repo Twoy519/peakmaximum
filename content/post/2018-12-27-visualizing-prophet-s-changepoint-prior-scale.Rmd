@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 ```{r, echo = FALSE, out.width = "300px"}
 
-knitr::include_graphics("/img/forecast_plot.gif")
+knitr::include_graphics("/img/changepoint_gif.gif")
 
 ```
 

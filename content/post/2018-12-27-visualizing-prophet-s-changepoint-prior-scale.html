@@ -11,7 +11,7 @@ keywords: ['rstats','prophet','forecasting','gifs','dataviz','visualization','gg
 
 
 
-<p><img src="/img/forecast_plot.gif" width="300px" style="display: block; margin: auto;" /></p>
+<p><img src="/img/changepoint_gif.gif" width="300px" style="display: block; margin: auto;" /></p>
 <p>As a followup to my <a href="https://peakmaximum.com/2018/12/22/visualizing-prophet-with-gganimate/">post about visualizing Prophet Forecast Output</a>, this post will do the same process of combing purrr/furrr and prophet to run a lot of forecasts in a more structured way and then visualizing the results with <code>gganimate</code>.</p>
 <p>The purpose of this post will be to provide a range of input values to the <code>changepoint.prior.scale</code> parameter and observe what it does to Prophet’s forecast and it’s confidence intervals. The output will be the gif at the top of this post.</p>
 <div id="step-1-fetch-data" class="section level1">

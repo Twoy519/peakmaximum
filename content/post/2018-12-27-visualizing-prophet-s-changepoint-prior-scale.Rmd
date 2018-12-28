@@ -1,0 +1,281 @@
+---
+title: Visualizing Prophet's changepoint.prior.scale
+author: porter
+date: '2018-12-27'
+slug: visualizing-prophet-s-changepoint-prior-scale
+categories: ['Data Visualization','R','Prophet','Forecasting','Data Visualization','gganimate','purrr','furrr']
+tags: ['R','Prophet','Forecasting','DataViz','gganimate','purrr','furrr']
+description: "Using gifs to demonstrate Prophet's changepoint.prior.scale parameter"
+keywords: ['rstats','prophet','forecasting','gifs','dataviz','visualization','gganimate','purrr','furrr']
+---
+
+```{r global_options, include=FALSE}
+
+knitr::opts_chunk$set(
+  fig.align = 'center'
+  , message = FALSE
+  , warning = FALSE
+  , error = FALSE
+  , cache = TRUE
+)
+
+```
+
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/forecast_plot.gif")
+
+```
+
+As a followup to my [post about visualizing Prophet Forecast Output](https://peakmaximum.com/2018/12/22/visualizing-prophet-with-gganimate/), this post will do the same process of combing purrr/furrr and prophet to run a lot of forecasts in a more structured way and then visualizing the results with `gganimate`.
+
+The purpose of this post will be to provide a range of input values to the `changepoint.prior.scale` parameter and observe what it does to Prophet's forecast and it's confidence intervals. The output will be the gif at the top of this post.
+
+# Step 1: Fetch Data
+We will use the same data we used in the first post, the number of en.wikipedia.org pageviews by day since October 2015
+
+
+```{r}
+library( 'pageviews')
+library( 'dplyr')
+
+trend_data <-
+  project_pageviews(
+    project = "en.wikipedia",
+    end = as.Date("2019-01-01"),
+    user_type="user"
+  )
+
+glimpse(trend_data)
+
+```
+
+Now we prepare to feed the data to Prophet by simplifying it to a 'ds' (date) and a 'y' column.
+
+```{r}
+
+input <- trend_data %>%
+  rename(
+    ds = date,
+    y = views
+  ) %>%
+  select(ds,y)
+
+str(input)
+
+```
+
+The parameter we'll be observing is called the `changepoint.prior.scale`. The documentation states this is the: "Parameter modulating the flexibility of the automatic changepoint selection. Large values will allow many changepoints, small values will allow few changepoints". When I read this I had no idea what this meant practically. I think all documentation should have a "this is what that means for you" translation. In order to see what this does, we will be running a lot of different forecasts with different values of this parameter passed in to observe what happens.
+
+# Step 2: Generate a lot of forecasts with different values
+
+We will go through a similar process of generating a new forecast every day, but we will multiply the number of forecasts per day by using several different values of `changepoint.prior.scale`. The package author [suggests](https://github.com/facebook/prophet/issues/660) "a starting range for a search would probably be [0.001, 1]. Depending on how many changepoints were specified, 1 would likely be effectively unregularized". Based on this we'll choose the following values: `c(0.001,0.01,0.05,0.5)`
+
+First, we need to prep the data as we did before, creating a nested dataframe that contains a forecast_date, and then a cell with the nested values of all prior days available.
+
+```{r}
+
+input$ds <- as.Date(input$ds)
+
+datelist <- seq(from=as.Date('2017-01-01'), to=as.Date(max(input$ds)), by = 'day') %>%
+  data.frame() %>% 
+  rename(forecast_date='.') %>% 
+  mutate(forecast_date = as.factor(forecast_date))
+
+historical_dates <- input %>%
+  mutate(ds=as.factor(ds)) %>%
+  select(ds) %>%
+  unique()
+
+full_dates <- expand.grid(
+    datelist$forecast_date,
+    historical_dates$ds
+  ) %>%
+  rename(
+    forecast_date = Var1,
+    ds = Var2
+  ) %>% 
+  mutate(
+    forecast_date = as.Date(forecast_date),
+    ds = as.Date(ds)
+    )
+
+full_dates <- full_dates[full_dates$forecast_date >= full_dates$ds,]
+
+full_dates <- full_dates %>%
+  left_join(input, by='ds')
+
+full_dates %<>%
+  group_by( forecast_date) %>% 
+  tidyr::nest()
+
+names(full_dates) <- c('forecast_date','model_data')
+
+head(full_dates)
+
+```
+
+We can pass in the different values for `changepoint.prior.scale` using a column in the dataframe. So we can take the `full_dates` dataframe and cross join it on the values we want to pass in to get the dataframe fully prepared. `CJ` from the `data.tables` package does a cross join
+
+```{r}
+library('data.table')
+
+# cp_values <- c(0.001,0.01,0.05,0.5)
+cp_values <- c(0.001,0.01)
+
+forecast_input <- CJ(full_dates$forecast_date, cp_values) %>% data.frame()
+
+names(forecast_input) <- c('forecast_date','cpps')
+
+forecast_input <- forecast_input %>% full_join(full_dates, by = 'forecast_date')
+
+```
+
+
+Then we declare a function to call `Prophet` with a variable to toggle the `changepoint.prior.scale` value.
+
+```{r eval=FALSE}
+
+prophet_call <- function(df, cpps) {
+    prophet(df=df, changepoint.prior.scale=cpps)
+}
+
+```
+
+```{r echo=TRUE, eval=FALSE}
+
+library( 'future')
+library( 'purrr')
+library( 'furrr')
+library( 'magrittr')
+library( 'prophet')
+
+future::plan(multiprocess)
+forecast_input %<>%
+  mutate(
+    model = furrr::future_map2(model_data, cpps, prophet_call)
+  )
+
+```
+
+```{r echo=TRUE, eval=FALSE}
+# Create empty future dataframe and predict
+plan(multiprocess)
+forecast_input <- forecast_input %>%
+  dplyr::mutate(
+    future = purrr::map(model, ~make_future_dataframe(., periods = 365))
+    , future = furrr::future_map2(model, future, predict)
+  )
+
+```
+
+```{r, eval=FALSE, echo=TRUE}
+forecast_df <- forecast_input %>%
+    select(forecast_date, cpps, future) %>%
+    tidyr::unnest() %>%
+    select(forecast_date, cpps, ds, yhat, yhat_upper, yhat_lower) %>% 
+    mutate(ds=as.Date(ds)) %>% 
+    left_join(input, by='ds')
+
+```
+
+```{r error=FALSE, message=FALSE, warning=FALSE, echo=TRUE, eval=FALSE}
+error_df <- forecast_df %>% 
+  group_by( forecast_date, cpps) %>% 
+  arrange( ds) %>% 
+  mutate(
+    in_error_window = between( ds - forecast_date, 1, 30)
+    , error = abs( ifelse( in_error_window, yhat/y-1, NA))
+  ) %>% 
+  group_by( forecast_date, cpps, in_error_window) %>% 
+  mutate(
+    mape_30d = mean(error)
+  ) %>% 
+  ungroup() %>%
+  filter(in_error_window) %>% 
+  group_by(forecast_date, cpps) %>% 
+  summarise(mape_30d = max(mape_30d))
+
+library( 'ggplot2')
+
+  ggplot(
+    error_df
+    , aes(x=forecast_date, y = mape_30d, color = as.factor(cpps))
+  ) +
+    geom_line() +
+    labs(title="Prophet's 30d MAPE on en.wikipedia.org Pageviews", color = 'changepoint.prior.scale') +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_date(date_breaks = '1 months', date_labels = '%b %y') +
+    theme(axis.text.x = element_text(angle=45, hjust=1), axis.title=element_blank(), panel.grid.major = element_line(color='grey',linetype=2), legend.position='top')
+  
+```
+
+```{r echo=FALSE}
+knitr::include_graphics("/img/changepoint_errors.png")
+```
+
+
+## Step 3: Make A Pretty gif Of This With gganimate
+
+Now let's make a gif of our forecast through time, partitioned by the `forecast_date` field!
+
+This long-term view is great because you can see where the `yearly.seasonality=TRUE` kicks in around October 2017.
+
+```{r eval=FALSE}
+
+forecast_plot <- ggplot(
+  forecast_df %>% filter(
+      ds >= '2017-01-01'
+      , cpps != 0.5
+    )
+  , aes(
+    x = ds
+    , group=forecast_date
+  )
+) +
+  facet_wrap(~cpps) +
+  geom_ribbon(
+    data = forecast_df %>%
+      filter(
+        ds >= forecast_date
+        , cpps != 0.5
+      )
+    , aes(ymin=yhat_lower/1e6, ymax=yhat_upper/1e6)
+    , fill='black'
+    , alpha = 0.5
+    ) +
+  geom_line(
+    aes( y = yhat/1e6)
+    , color = 'tomato'
+    , linetype = 2
+    , alpha=0.3
+  ) +
+  geom_line(
+    data = forecast_df %>%
+      filter(
+        ds >= '2017-01-01'
+        , ds <= forecast_date
+        , cpps != 0.5
+      )
+    , aes( y = y/1e6)
+    ) +
+  scale_x_date(date_breaks = '1 month', date_labels='%b %y') +
+  theme(axis.text.x=element_text(angle=45, hjust = 1)) +
+  labs(
+    title = 'Wikipedia Pageviews (MM) Forecast as of Date: {frame_time}'
+    , subtitle='Faceted by `changepoint.prior.scale` values'
+    , x = element_blank()
+    , y = element_blank()
+    ) +
+  transition_time(forecast_date) +
+  ease_aes('linear')
+
+gganimate::animate(forecast_plot, width = 800, height = 450)
+```
+
+```{r echo=FALSE}
+
+knitr::include_graphics("/img/changepoint_gif.gif")
+
+```
+

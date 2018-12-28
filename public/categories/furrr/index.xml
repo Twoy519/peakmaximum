@@ -6,10 +6,20 @@
     <description>Recent content in Furrr on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 22 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 27 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/furrr/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Visualizing Prophet&#39;s changepoint.prior.scale</title>
+      <link>/2018/12/27/visualizing-prophet-s-changepoint-prior-scale/</link>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/12/27/visualizing-prophet-s-changepoint-prior-scale/</guid>
+      <description>As a followup to my post about visualizing Prophet Forecast Output, this post will do the same process of combing purrr/furrr and prophet to run a lot of forecasts in a more structured way and then visualizing the results with gganimate.
+The purpose of this post will be to provide a range of input values to the changepoint.prior.scale parameter and observe what it does to Prophet’s forecast and it’s confidence intervals.</description>
+    </item>
     
     <item>
       <title>Visualizing Prophet Forecasts (And Errors) with purrr, and gganimate</title>

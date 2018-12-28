@@ -1,0 +1,225 @@
+---
+title: Visualizing Prophet's changepoint.prior.scale
+author: porter
+date: '2018-12-27'
+slug: visualizing-prophet-s-changepoint-prior-scale
+categories: ['Data Visualization','R','Prophet','Forecasting','Data Visualization','gganimate','purrr','furrr']
+tags: ['R','Prophet','Forecasting','DataViz','gganimate','purrr','furrr']
+description: "Using gifs to demonstrate Prophet's changepoint.prior.scale parameter"
+keywords: ['rstats','prophet','forecasting','gifs','dataviz','visualization','gganimate','purrr','furrr']
+---
+
+
+
+<p><img src="/img/forecast_plot.gif" width="300px" style="display: block; margin: auto;" /></p>
+<p>As a followup to my <a href="https://peakmaximum.com/2018/12/22/visualizing-prophet-with-gganimate/">post about visualizing Prophet Forecast Output</a>, this post will do the same process of combing purrr/furrr and prophet to run a lot of forecasts in a more structured way and then visualizing the results with <code>gganimate</code>.</p>
+<p>The purpose of this post will be to provide a range of input values to the <code>changepoint.prior.scale</code> parameter and observe what it does to Prophet’s forecast and it’s confidence intervals. The output will be the gif at the top of this post.</p>
+<div id="step-1-fetch-data" class="section level1">
+<h1>Step 1: Fetch Data</h1>
+<p>We will use the same data we used in the first post, the number of en.wikipedia.org pageviews by day since October 2015</p>
+<pre class="r"><code>library( &#39;pageviews&#39;)
+library( &#39;dplyr&#39;)
+
+trend_data &lt;-
+  project_pageviews(
+    project = &quot;en.wikipedia&quot;,
+    end = as.Date(&quot;2019-01-01&quot;),
+    user_type=&quot;user&quot;
+  )
+
+glimpse(trend_data)</code></pre>
+<pre><code>## Observations: 1,184
+## Variables: 7
+## $ project     &lt;chr&gt; &quot;wikipedia&quot;, &quot;wikipedia&quot;, &quot;wikipedia&quot;, &quot;wikipedia&quot;...
+## $ language    &lt;chr&gt; &quot;en&quot;, &quot;en&quot;, &quot;en&quot;, &quot;en&quot;, &quot;en&quot;, &quot;en&quot;, &quot;en&quot;, &quot;en&quot;, &quot;e...
+## $ access      &lt;chr&gt; &quot;all-access&quot;, &quot;all-access&quot;, &quot;all-access&quot;, &quot;all-acc...
+## $ agent       &lt;chr&gt; &quot;user&quot;, &quot;user&quot;, &quot;user&quot;, &quot;user&quot;, &quot;user&quot;, &quot;user&quot;, &quot;u...
+## $ granularity &lt;chr&gt; &quot;daily&quot;, &quot;daily&quot;, &quot;daily&quot;, &quot;daily&quot;, &quot;daily&quot;, &quot;dail...
+## $ date        &lt;dttm&gt; 2015-10-01, 2015-10-02, 2015-10-03, 2015-10-04, 2...
+## $ views       &lt;dbl&gt; 238845634, 234121441, 221478394, 244396567, 259720...</code></pre>
+<p>Now we prepare to feed the data to Prophet by simplifying it to a ‘ds’ (date) and a ‘y’ column.</p>
+<pre class="r"><code>input &lt;- trend_data %&gt;%
+  rename(
+    ds = date,
+    y = views
+  ) %&gt;%
+  select(ds,y)
+
+str(input)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    1184 obs. of  2 variables:
+##  $ ds: POSIXct, format: &quot;2015-10-01&quot; &quot;2015-10-02&quot; ...
+##  $ y : num  2.39e+08 2.34e+08 2.21e+08 2.44e+08 2.60e+08 ...</code></pre>
+<p>The parameter we’ll be observing is called the <code>changepoint.prior.scale</code>. The documentation states this is the: “Parameter modulating the flexibility of the automatic changepoint selection. Large values will allow many changepoints, small values will allow few changepoints”. When I read this I had no idea what this meant practically. I think all documentation should have a “this is what that means for you” translation. In order to see what this does, we will be running a lot of different forecasts with different values of this parameter passed in to observe what happens.</p>
+</div>
+<div id="step-2-generate-a-lot-of-forecasts-with-different-values" class="section level1">
+<h1>Step 2: Generate a lot of forecasts with different values</h1>
+<p>We will go through a similar process of generating a new forecast every day, but we will multiply the number of forecasts per day by using several different values of <code>changepoint.prior.scale</code>. The package author <a href="https://github.com/facebook/prophet/issues/660">suggests</a> “a starting range for a search would probably be [0.001, 1]. Depending on how many changepoints were specified, 1 would likely be effectively unregularized”. Based on this we’ll choose the following values: <code>c(0.001,0.01,0.05,0.5)</code></p>
+<p>First, we need to prep the data as we did before, creating a nested dataframe that contains a forecast_date, and then a cell with the nested values of all prior days available.</p>
+<pre class="r"><code>input$ds &lt;- as.Date(input$ds)
+
+datelist &lt;- seq(from=as.Date(&#39;2017-01-01&#39;), to=as.Date(max(input$ds)), by = &#39;day&#39;) %&gt;%
+  data.frame() %&gt;% 
+  rename(forecast_date=&#39;.&#39;) %&gt;% 
+  mutate(forecast_date = as.factor(forecast_date))
+
+historical_dates &lt;- input %&gt;%
+  mutate(ds=as.factor(ds)) %&gt;%
+  select(ds) %&gt;%
+  unique()
+
+full_dates &lt;- expand.grid(
+    datelist$forecast_date,
+    historical_dates$ds
+  ) %&gt;%
+  rename(
+    forecast_date = Var1,
+    ds = Var2
+  ) %&gt;% 
+  mutate(
+    forecast_date = as.Date(forecast_date),
+    ds = as.Date(ds)
+    )
+
+full_dates &lt;- full_dates[full_dates$forecast_date &gt;= full_dates$ds,]
+
+full_dates &lt;- full_dates %&gt;%
+  left_join(input, by=&#39;ds&#39;)
+
+full_dates %&lt;&gt;%
+  group_by( forecast_date) %&gt;% 
+  tidyr::nest()
+
+names(full_dates) &lt;- c(&#39;forecast_date&#39;,&#39;model_data&#39;)
+
+head(full_dates)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   forecast_date model_data        
+##   &lt;date&gt;        &lt;list&gt;            
+## 1 2017-01-01    &lt;tibble [459 × 2]&gt;
+## 2 2017-01-02    &lt;tibble [460 × 2]&gt;
+## 3 2017-01-03    &lt;tibble [461 × 2]&gt;
+## 4 2017-01-04    &lt;tibble [462 × 2]&gt;
+## 5 2017-01-05    &lt;tibble [463 × 2]&gt;
+## 6 2017-01-06    &lt;tibble [464 × 2]&gt;</code></pre>
+<p>We can pass in the different values for <code>changepoint.prior.scale</code> using a column in the dataframe. So we can take the <code>full_dates</code> dataframe and cross join it on the values we want to pass in to get the dataframe fully prepared. <code>CJ</code> from the <code>data.tables</code> package does a cross join</p>
+<pre class="r"><code>library(&#39;data.table&#39;)
+
+# cp_values &lt;- c(0.001,0.01,0.05,0.5)
+cp_values &lt;- c(0.001,0.01)
+
+forecast_input &lt;- CJ(full_dates$forecast_date, cp_values) %&gt;% data.frame()
+
+names(forecast_input) &lt;- c(&#39;forecast_date&#39;,&#39;cpps&#39;)
+
+forecast_input &lt;- forecast_input %&gt;% full_join(full_dates, by = &#39;forecast_date&#39;)</code></pre>
+<p>Then we declare a function to call <code>Prophet</code> with a variable to toggle the <code>changepoint.prior.scale</code> value.</p>
+<pre class="r"><code>prophet_call &lt;- function(df, cpps) {
+    prophet(df=df, changepoint.prior.scale=cpps)
+}</code></pre>
+<pre class="r"><code>library( &#39;future&#39;)
+library( &#39;purrr&#39;)
+library( &#39;furrr&#39;)
+library( &#39;magrittr&#39;)
+library( &#39;prophet&#39;)
+
+future::plan(multiprocess)
+forecast_input %&lt;&gt;%
+  mutate(
+    model = furrr::future_map2(model_data, cpps, prophet_call)
+  )</code></pre>
+<pre class="r"><code># Create empty future dataframe and predict
+plan(multiprocess)
+forecast_input &lt;- forecast_input %&gt;%
+  dplyr::mutate(
+    future = purrr::map(model, ~make_future_dataframe(., periods = 365))
+    , future = furrr::future_map2(model, future, predict)
+  )</code></pre>
+<pre class="r"><code>forecast_df &lt;- forecast_input %&gt;%
+    select(forecast_date, cpps, future) %&gt;%
+    tidyr::unnest() %&gt;%
+    select(forecast_date, cpps, ds, yhat, yhat_upper, yhat_lower) %&gt;% 
+    mutate(ds=as.Date(ds)) %&gt;% 
+    left_join(input, by=&#39;ds&#39;)</code></pre>
+<pre class="r"><code>error_df &lt;- forecast_df %&gt;% 
+  group_by( forecast_date, cpps) %&gt;% 
+  arrange( ds) %&gt;% 
+  mutate(
+    in_error_window = between( ds - forecast_date, 1, 30)
+    , error = abs( ifelse( in_error_window, yhat/y-1, NA))
+  ) %&gt;% 
+  group_by( forecast_date, cpps, in_error_window) %&gt;% 
+  mutate(
+    mape_30d = mean(error)
+  ) %&gt;% 
+  ungroup() %&gt;%
+  filter(in_error_window) %&gt;% 
+  group_by(forecast_date, cpps) %&gt;% 
+  summarise(mape_30d = max(mape_30d))
+
+library( &#39;ggplot2&#39;)
+
+  ggplot(
+    error_df
+    , aes(x=forecast_date, y = mape_30d, color = as.factor(cpps))
+  ) +
+    geom_line() +
+    labs(title=&quot;Prophet&#39;s 30d MAPE on en.wikipedia.org Pageviews&quot;, color = &#39;changepoint.prior.scale&#39;) +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_date(date_breaks = &#39;1 months&#39;, date_labels = &#39;%b %y&#39;) +
+    theme(axis.text.x = element_text(angle=45, hjust=1), axis.title=element_blank(), panel.grid.major = element_line(color=&#39;grey&#39;,linetype=2), legend.position=&#39;top&#39;)</code></pre>
+<p><img src="/img/changepoint_errors.png" style="display: block; margin: auto;" /></p>
+<div id="step-3-make-a-pretty-gif-of-this-with-gganimate" class="section level2">
+<h2>Step 3: Make A Pretty gif Of This With gganimate</h2>
+<p>Now let’s make a gif of our forecast through time, partitioned by the <code>forecast_date</code> field!</p>
+<p>This long-term view is great because you can see where the <code>yearly.seasonality=TRUE</code> kicks in around October 2017.</p>
+<pre class="r"><code>forecast_plot &lt;- ggplot(
+  forecast_df %&gt;% filter(
+      ds &gt;= &#39;2017-01-01&#39;
+      , cpps != 0.5
+    )
+  , aes(
+    x = ds
+    , group=forecast_date
+  )
+) +
+  facet_wrap(~cpps) +
+  geom_ribbon(
+    data = forecast_df %&gt;%
+      filter(
+        ds &gt;= forecast_date
+        , cpps != 0.5
+      )
+    , aes(ymin=yhat_lower/1e6, ymax=yhat_upper/1e6)
+    , fill=&#39;black&#39;
+    , alpha = 0.5
+    ) +
+  geom_line(
+    aes( y = yhat/1e6)
+    , color = &#39;tomato&#39;
+    , linetype = 2
+    , alpha=0.3
+  ) +
+  geom_line(
+    data = forecast_df %&gt;%
+      filter(
+        ds &gt;= &#39;2017-01-01&#39;
+        , ds &lt;= forecast_date
+        , cpps != 0.5
+      )
+    , aes( y = y/1e6)
+    ) +
+  scale_x_date(date_breaks = &#39;1 month&#39;, date_labels=&#39;%b %y&#39;) +
+  theme(axis.text.x=element_text(angle=45, hjust = 1)) +
+  labs(
+    title = &#39;Wikipedia Pageviews (MM) Forecast as of Date: {frame_time}&#39;
+    , subtitle=&#39;Faceted by `changepoint.prior.scale` values&#39;
+    , x = element_blank()
+    , y = element_blank()
+    ) +
+  transition_time(forecast_date) +
+  ease_aes(&#39;linear&#39;)
+
+gganimate::animate(forecast_plot, width = 800, height = 450)</code></pre>
+<p><img src="/img/changepoint_gif.gif" style="display: block; margin: auto;" /></p>
+</div>
+</div>

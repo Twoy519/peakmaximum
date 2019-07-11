@@ -41,7 +41,8 @@ It turns out the artist is [Lenore Tawney](https://www.tate.org.uk/art/artists/l
 
 The one I captured at the Tate that day is called ["Reflected Ray"](https://www.tate.org.uk/art/artworks/tawney-reflected-ray-l03880). I loved how it is simple enough to be something you would expect to see in a middle-schooler's notebook, but the large format, the colors, the 1960's drafting cross section paper, and just the overall beautiful style and symmetry make it something subtle and unique.
 
-# Using `ggpomological'
+# Using [ggpomological](https://github.com/gadenbuie/ggpomological)
+
 I ran into [ggpomological](https://github.com/gadenbuie/ggpomological) a while ago and I thought it looked awesome. Unfortunately, I didn't see much application in the work environment where I spend 99% of my R time. When I was looking at the Lenore Tawney artwork again today thouh I thought it would be a fun application of the [`paint_pomological()` feature](https://github.com/gadenbuie/ggpomological) which uses `magick` to give a ggplot output the look of hand-drawing on paper. In this demo I'll use this feature to make a pretty cool rendering of Lenore Tawney's Reflected Ray in ggplot.
 
 # R Code
@@ -54,7 +55,7 @@ require( 'ggplot2')
 require( 'ggpomological')
 ```
 
-One of the more tedious parts of this that I'm leaving out is actually the generation of the underlying dataset. Basically I visually examined the x and y coordinates of all the lines in the artwork and made some calculations to bring everything together. I haven't come up with the fancy math to do this but if anyone out there wants to do that please let me know your process [@_T_R_O_Y](https://twitter.com/_T_R_O_Y).
+One of the more tedious parts of this that I'm leaving out is actually the generation of the underlying dataset. Basically I visually examined the x and y coordinates of all the lines in the artwork and made some calculations to bring everything together. I haven't come up with the fancy math to do this but if anyone out there wants to do that please [let me know your process](https://twitter.com/_T_R_O_Y).
 
 I uploaded the file to my repo for this site:
 
@@ -68,15 +69,15 @@ I did a bad job naming all the line segment groups, but basically each line has 
 
 ## Plot
 
-1. We use `geom_segment` to pass the coordinates and the colors
+* We use `geom_segment` to pass the coordinates and the colors
 
-2. The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10's. We pass `expand=c(0,0)` to the `scale_*_continuous` pieces in order to bring the axes right up to the edge of the plot area panel.
+* The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10's. We pass `expand=c(0,0)` to the `scale_*_continuous` pieces in order to bring the axes right up to the edge of the plot area panel.
 
-3. I downloaded the font ['Homemade Apple'](https://fonts.google.com/specimen/Homemade+Apple/) which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into `theme_pomological_fancy()`
+* I downloaded the font ['Homemade Apple'](https://fonts.google.com/specimen/Homemade+Apple/) which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into `theme_pomological_fancy()`
 
-4. I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.
+* I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.
 
-5. I set the colors
+* I set the colors
 
 ```{r}
 plt <- ggplot(d.in) +
@@ -120,13 +121,4 @@ paint_pomological(
 )
 ```
 
-And there ya go :)
-
-```{r, echo = FALSE, out.width = "300px"}
-
-knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964_small.png")
-
-```
-
-
-
+ 🔥 And there ya go! 🔥

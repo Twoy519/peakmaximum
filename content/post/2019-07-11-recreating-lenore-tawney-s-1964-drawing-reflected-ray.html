@@ -17,8 +17,9 @@ tags: ['rstats','ggplot','ggpomological']
 <p>It turns out the artist is <a href="https://www.tate.org.uk/art/artists/lenore-tawney-24528">Lenore Tawney</a> but other images of her artwork were actually pretty difficult to find. By this of course I mean I couldn’t find much on the first page of Google results. She is actually more well-known for her work with “fiber” and yarn but she has what I think is a <a href="http://lenoretawney.org/lenore-tawney/work/drawing/">beautiful collection of Ink Drawings</a>.</p>
 <p>The one I captured at the Tate that day is called <a href="https://www.tate.org.uk/art/artworks/tawney-reflected-ray-l03880">“Reflected Ray”</a>. I loved how it is simple enough to be something you would expect to see in a middle-schooler’s notebook, but the large format, the colors, the 1960’s drafting cross section paper, and just the overall beautiful style and symmetry make it something subtle and unique.</p>
 </div>
-<div id="using-ggpomological-i-ran-into-ggpomologicalhttpsgithub.comgadenbuieggpomological-a-while-ago-and-i-thought-it-looked-awesome.-unfortunately-i-didnt-see-much-application-in-the-work-environment-where-i-spend-99-of-my-r-time.-when-i-was-looking-at-the-lenore-tawney-artwork-again-today-thouh-i-thought-it-would-be-a-fun-application-of-the-paint_pomologicalfeaturehttpsgithub.comgadenbuieggpomological-which-usesmagick-to-give-a-ggplot-output-the-look-of-hand-drawing-on-paper.-in-this-demo-ill-use-this-feature-to-make-a-pretty-cool-rendering-of-lenore-tawneys-reflected-ray-in-ggplot." class="section level1">
-<h1>Using <code>ggpomological' I ran into [ggpomological](https://github.com/gadenbuie/ggpomological) a while ago and I thought it looked awesome. Unfortunately, I didn't see much application in the work environment where I spend 99% of my R time. When I was looking at the Lenore Tawney artwork again today thouh I thought it would be a fun application of the [</code>paint_pomological()<code>feature](https://github.com/gadenbuie/ggpomological) which uses</code>magick` to give a ggplot output the look of hand-drawing on paper. In this demo I’ll use this feature to make a pretty cool rendering of Lenore Tawney’s Reflected Ray in ggplot.</h1>
+<div id="using-ggpomological" class="section level1">
+<h1>Using <a href="https://github.com/gadenbuie/ggpomological">ggpomological</a></h1>
+<p>I ran into <a href="https://github.com/gadenbuie/ggpomological">ggpomological</a> a while ago and I thought it looked awesome. Unfortunately, I didn’t see much application in the work environment where I spend 99% of my R time. When I was looking at the Lenore Tawney artwork again today thouh I thought it would be a fun application of the <a href="https://github.com/gadenbuie/ggpomological"><code>paint_pomological()</code> feature</a> which uses <code>magick</code> to give a ggplot output the look of hand-drawing on paper. In this demo I’ll use this feature to make a pretty cool rendering of Lenore Tawney’s Reflected Ray in ggplot.</p>
 </div>
 <div id="r-code" class="section level1">
 <h1>R Code</h1>
@@ -26,7 +27,7 @@ tags: ['rstats','ggplot','ggpomological']
 <pre class="r"><code>require( &#39;dplyr&#39;)
 require( &#39;ggplot2&#39;)
 require( &#39;ggpomological&#39;)</code></pre>
-<p>One of the more tedious parts of this that I’m leaving out is actually the generation of the underlying dataset. Basically I visually examined the x and y coordinates of all the lines in the artwork and made some calculations to bring everything together. I haven’t come up with the fancy math to do this but if anyone out there wants to do that please let me know your process <span class="citation">[@_T_R_O_Y]</span>(<a href="https://twitter.com/_T_R_O_Y" class="uri">https://twitter.com/_T_R_O_Y</a>).</p>
+<p>One of the more tedious parts of this that I’m leaving out is actually the generation of the underlying dataset. Basically I visually examined the x and y coordinates of all the lines in the artwork and made some calculations to bring everything together. I haven’t come up with the fancy math to do this but if anyone out there wants to do that please <a href="https://twitter.com/_T_R_O_Y">let me know your process</a>.</p>
 <p>I uploaded the file to my repo for this site:</p>
 <pre class="r"><code>d.in &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/Twoy519/peakmaximum/master/reflected_ray_data.csv&#39;)
 
@@ -43,13 +44,13 @@ head(d.in)</code></pre>
 <p>I did a bad job naming all the line segment groups, but basically each line has a color as well as the starting point {x1, y1} and the ending point {x2, y2}.</p>
 <div id="plot" class="section level2">
 <h2>Plot</h2>
-<ol style="list-style-type: decimal">
+<ul>
 <li><p>We use <code>geom_segment</code> to pass the coordinates and the colors</p></li>
 <li><p>The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10’s. We pass <code>expand=c(0,0)</code> to the <code>scale_*_continuous</code> pieces in order to bring the axes right up to the edge of the plot area panel.</p></li>
 <li><p>I downloaded the font <a href="https://fonts.google.com/specimen/Homemade+Apple/">‘Homemade Apple’</a> which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into <code>theme_pomological_fancy()</code></p></li>
 <li><p>I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.</p></li>
 <li><p>I set the colors</p></li>
-</ol>
+</ul>
 <pre class="r"><code>plt &lt;- ggplot(d.in) +
   geom_segment(aes(x=x1, y=y1, xend=x2, yend=y2, color=color), alpha = 0.2) +
   scale_x_continuous(
@@ -86,7 +87,6 @@ head(d.in)</code></pre>
   , height = 220 * 5
 )</code></pre>
 <p><img src="/post/2019-07-11-recreating-lenore-tawney-s-1964-drawing-reflected-ray_files/figure-html/unnamed-chunk-6-1.png" width="450" style="display: block; margin: auto;" /></p>
-<p>And there ya go :)</p>
-<p><img src="/img/lenore_tawney_reflected_ray_1964_small.png" width="300px" style="display: block; margin: auto;" /></p>
+<p> 🔥 And there ya go! 🔥</p>
 </div>
 </div>

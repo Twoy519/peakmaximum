@@ -110,6 +110,13 @@ plt <- ggplot(d.in) +
   scale_color_manual(values=c('black','#8F0F01'))
 ```
 
+Our plot looks like this with the default ggplot output
+
+```{r}
+plt
+```
+
+
 The piece that puts the icing on the cake here in terms of making the font look more like handwriting and the background look more like paper is set with `paint_pomological`.
 
 ```{r}

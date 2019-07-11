@@ -112,7 +112,7 @@ plt <- ggplot(d.in) +
 
 Our plot looks like this with the default ggplot output
 
-```{r}
+```{r, fig.width=3, fig.height=3.67}
 plt
 ```
 

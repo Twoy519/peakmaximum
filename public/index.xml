@@ -6,10 +6,19 @@
     <description>Recent content on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 27 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 11 Jul 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Recreating Lenore Tawney&#39;s 1964 Drawing &#39;Reflected Ray&#39;</title>
+      <link>/2019/07/11/recreating-lenore-tawney-s-1964-drawing-reflected-ray/</link>
+      <pubDate>Thu, 11 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/07/11/recreating-lenore-tawney-s-1964-drawing-reflected-ray/</guid>
+      <description>Background My wife and I moved to London in early 2017. One of the first things we did when we got here was visit the Tate Museum. While there, I walked by a subtle trio of drawings by an artist I had never heard of. I took a photo of my favorite and kept walking. We recently gave birth to our first daughter. One of the first things we did when this happened was to immediately prioritize backing up every photo we’ve ever taken of anything.</description>
+    </item>
     
     <item>
       <title>Visualizing Prophet&#39;s changepoint.prior.scale</title>
@@ -49,7 +58,7 @@ The purpose of this post will be to provide a range of input values to the chang
       <guid>/2018/02/23/grouped-summary-with-purrr-map/</guid>
       <description>COPY / PASTE HERE:   mtcars %&amp;gt;% split(.$cyl) %&amp;gt;% map(summary)
  This is a quick one and sourced from this SO answer but I kept googling it so wanted to just put it up here.
-require(dplyr) require(purrr) mtcars %&amp;gt;% split(.$cyl) %&amp;gt;% map(summary) ## $`4` ## mpg cyl disp hp ## Min. :21.40 Min. :4 Min. : 71.10 Min. : 52.00 ## 1st Qu.:22.80 1st Qu.:4 1st Qu.: 78.85 1st Qu.</description>
+require(dplyr) require(purrr) mtcars %&amp;gt;% split(.$cyl) %&amp;gt;% map(summary) ## $`4` ## mpg cyl disp hp ## Min. :21.40 Min. :4 Min. : 71.10 Min. : 52.00 ## 1st Qu.:22.80 1st Qu.:4 1st Qu.: 78.</description>
     </item>
     
     <item>
@@ -70,7 +79,7 @@ require(dplyr) require(purrr) mtcars %&amp;gt;% split(.$cyl) %&amp;gt;% map(summ
       
       <guid>/2017/12/05/indexed-time-series-changes/</guid>
       <description>COPY / PASTE HERE:   mutate( index = value / value[1] - 1 )
- One thing I do at my job all. the. time is index time-series together in order to compare relative changes in a given time window. The problem statement is usually when I’m comparing the price changes of two assets with vastly different prices. So trying to plot something moving from $1MM to $1.1MM on the same plot as something moving from $10 to $11.</description>
+ One thing I do at my job all. the. time is index time-series together in order to compare relative changes in a given time window. The problem statement is usually when I’m comparing the price changes of two assets with vastly different prices. So trying to plot something moving from $1MM to $1.</description>
     </item>
     
     <item>

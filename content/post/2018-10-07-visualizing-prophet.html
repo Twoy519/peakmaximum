@@ -127,11 +127,9 @@ plot(m, forecast)</code></pre>
 <p><img src="/post/2018-10-07-visualizing-prophet_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>But! None of this is really why we’re here. Let’s use the power of <code>purrr</code> and <code>gganimate</code> to run a whole bunch of forecasts and check how <code>Prophet</code> performs.</p>
 <hr />
-</div>
-</div>
-<div id="part-4-using-furrr" class="section level1">
-<h1>Part 4: Using <a href="https://github.com/DavisVaughan/furrr">furrr</a></h1>
+<p>#Part 4: Using <a href="https://github.com/DavisVaughan/furrr">furrr</a></p>
 <p>Our end goal is to generate multiple forecasts and compare the results. The problem with this is that <code>Prophet</code> forecasts take some time to generate. Not a <strong>long</strong> time, but enough time that if you want to run more than a handful, you will have time go get a hot or cold beverage of your choice and maybe a lunch and a dinner by time time they finish. To quote the <code>furrr</code> <a href="https://github.com/DavisVaughan/furrr">documentation</a>, furr “Appl(ies) Mapping Functions in Parallel using Futures”. That means stuff may go faster if we use <code>furrr</code>.</p>
+</div>
 <div id="step-1-generating-backtest-data" class="section level2">
 <h2>Step 1: Generating Backtest Data</h2>
 <p>We want to run a forecast every day starting in 2017 (when we have a good history of data from 2015 and 2016) up to today (Dec 21, 2018) and then compare the results to what actually happened.</p>
@@ -247,7 +245,7 @@ full_dates &lt;- full_dates %&gt;%
 <h1>Part 5: Plotting The Results with gganimate</h1>
 <div id="step-1-view-the-output" class="section level2">
 <h2>Step 1: View the output</h2>
-<p>Let’s unnest the data and look at an example date of Jan. 1 2017</p>
+<p>Let’s unnest the data and look at an example date of Jan. 1 2017</p>
 <pre class="r"><code>forecast_df &lt;- full_dates %&gt;%
     filter(forecast_date == &#39;2017-01-01&#39;) %&gt;% 
     select(forecast_date, future) %&gt;%

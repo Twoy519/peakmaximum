@@ -58,26 +58,26 @@ library( scales)
 glimpse( trend_data)</code></pre>
 <pre><code>## Observations: 3,281
 ## Variables: 3
-## $ date    &lt;date&gt; 2016-01-01, 2016-01-02, 2016-01-03, 2016-01-04, 2016-...
-## $ article &lt;fctr&gt; Luis_Suárez, Luis_Suárez, Luis_Suárez, Luis_Suárez, L...
-## $ views   &lt;dbl&gt; 6809, 8033, 6251, 6378, 6427, 6277, 6580, 6349, 7734, ...</code></pre>
+## $ date    &lt;date&gt; 2016-01-01, 2016-01-02, 2016-01-03, 2016-01-04, 2016-01…
+## $ article &lt;fct&gt; Luis_Suárez, Luis_Suárez, Luis_Suárez, Luis_Suárez, Luis…
+## $ views   &lt;dbl&gt; 6809, 8033, 6251, 6378, 6427, 6277, 6580, 6349, 7734, 69…</code></pre>
 <pre class="r"><code>trend_data %&gt;%
   group_by( article) %&gt;% 
   summarise( pageviews = sum(views, na.rm=T)) %&gt;% 
   arrange(-pageviews) %&gt;%
   mutate( pageviews = scales::comma(pageviews))</code></pre>
 <pre><code>## # A tibble: 9 x 2
-##             article  pageviews
-##              &lt;fctr&gt;      &lt;chr&gt;
-## 1      Lionel_Messi 12,323,125
-## 2            Neymar  4,214,055
-## 3       Luis_Suárez  2,564,810
-## 4        Harry_Kane  1,709,017
-## 5 Christian_Pulisic  1,295,802
-## 6 Philippe_Coutinho  1,001,555
-## 7   Roberto_Firmino    869,566
-## 8     Mohamed_Salah    507,699
-## 9  Jordan_Henderson    500,496</code></pre>
+##   article           pageviews 
+##   &lt;fct&gt;             &lt;chr&gt;     
+## 1 Lionel_Messi      12,323,125
+## 2 Neymar            4,214,055 
+## 3 Luis_Suárez       2,564,810 
+## 4 Harry_Kane        1,709,017 
+## 5 Christian_Pulisic 1,295,802 
+## 6 Philippe_Coutinho 1,001,555 
+## 7 Roberto_Firmino   869,566   
+## 8 Mohamed_Salah     507,699   
+## 9 Jordan_Henderson  500,496</code></pre>
 <p>So we see that we have a time series with grouping variables that are magnitudes different in scale due to the varying popularities of the footballer. The problem this poses is that looking at a time-series trend is hard to parse for changes.</p>
 <pre class="r"><code>library( ggplot2)
 

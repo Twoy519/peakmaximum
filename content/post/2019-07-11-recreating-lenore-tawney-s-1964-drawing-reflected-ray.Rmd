@@ -1,0 +1,132 @@
+---
+title: Recreating Lenore Tawney's 1964 Drawing 'Reflected Ray'
+author: "Troy Porter"
+date: '2019-07-11'
+slug: recreating-lenore-tawney-s-1964-drawing-reflected-ray
+categories: ['rstats','dataviz']
+tags: ['rstats','ggplot','ggpomological']
+---
+
+```{r global_options, include=FALSE}
+
+knitr::opts_chunk$set(
+    fig.align = 'center'
+    , message = FALSE
+    , warning = FALSE
+    , error = FALSE
+    , cache = TRUE
+  )
+
+```
+
+
+
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964_small.png")
+
+```
+
+# Background
+
+My wife and I moved to London in early 2017. One of the first things we did when we got here was visit the Tate Museum. While there, I walked by a subtle trio of drawings by an artist I had never heard of. I took a photo of my favorite and kept walking. We recently gave birth to our first daughter. One of the first things we did when this happened was to immediately prioritize backing up every photo we've ever taken of anything. It was during this process that I stumbled upon my original image.
+
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/lenore_tawney_iphone_photo.jpg")
+
+```
+
+It turns out the artist is [Lenore Tawney](https://www.tate.org.uk/art/artists/lenore-tawney-24528) but other images of her artwork were actually pretty difficult to find. By this of course I mean I couldn't find much on the first page of Google results. She is actually more well-known for her work with "fiber" and yarn but she has what I think is a [beautiful collection of Ink Drawings](http://lenoretawney.org/lenore-tawney/work/drawing/).
+
+The one I captured at the Tate that day is called ["Reflected Ray"](https://www.tate.org.uk/art/artworks/tawney-reflected-ray-l03880). I loved how it is simple enough to be something you would expect to see in a middle-schooler's notebook, but the large format, the colors, the 1960's drafting cross section paper, and just the overall beautiful style and symmetry make it something subtle and unique.
+
+# Using `ggpomological'
+I ran into [ggpomological](https://github.com/gadenbuie/ggpomological) a while ago and I thought it looked awesome. Unfortunately, I didn't see much application in the work environment where I spend 99% of my R time. When I was looking at the Lenore Tawney artwork again today thouh I thought it would be a fun application of the [`paint_pomological()` feature](https://github.com/gadenbuie/ggpomological) which uses `magick` to give a ggplot output the look of hand-drawing on paper. In this demo I'll use this feature to make a pretty cool rendering of Lenore Tawney's Reflected Ray in ggplot.
+
+# R Code
+
+We'll use dplyr for data-munging, ggplot2 for plotting, and ggpomological for the theme and paper effect.
+
+```{r}
+require( 'dplyr')
+require( 'ggplot2')
+require( 'ggpomological')
+```
+
+One of the more tedious parts of this that I'm leaving out is actually the generation of the underlying dataset. Basically I visually examined the x and y coordinates of all the lines in the artwork and made some calculations to bring everything together. I haven't come up with the fancy math to do this but if anyone out there wants to do that please let me know your process [@_T_R_O_Y](https://twitter.com/_T_R_O_Y).
+
+I uploaded the file to my repo for this site:
+
+```{r}
+d.in <- readr::read_csv('https://raw.githubusercontent.com/Twoy519/peakmaximum/master/reflected_ray_data.csv')
+
+head(d.in)
+```
+
+I did a bad job naming all the line segment groups, but basically each line has a color as well as the starting point {x1, y1} and the ending point {x2, y2}.
+
+## Plot
+
+1. We use `geom_segment` to pass the coordinates and the colors
+
+2. The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10's. We pass `expand=c(0,0)` to the `scale_*_continuous` pieces in order to bring the axes right up to the edge of the plot area panel.
+
+3. I downloaded the font ['Homemade Apple'](https://fonts.google.com/specimen/Homemade+Apple/) which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into `theme_pomological_fancy()`
+
+4. I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.
+
+5. I set the colors
+
+```{r}
+plt <- ggplot(d.in) +
+  geom_segment(aes(x=x1, y=y1, xend=x2, yend=y2, color=color), alpha = 0.2) +
+  scale_x_continuous(
+    limits = c(0,160)
+    , breaks = seq(0,160, by = 10)
+    , minor_breaks = seq(0,160, by = 1)
+    , expand = c(0,0)
+  ) +
+  scale_y_continuous(
+    limits = c(0,200)
+    , breaks = seq(0,200, by = 10)
+    , minor_breaks = seq(0,200, by = 1)
+    , expand = c(0,0)
+    , position='right'
+  ) +
+  labs(
+    caption='Reflected ray'
+  ) +
+  theme_pomological_fancy() +
+  theme(
+    legend.position = 'none'
+    , axis.text = element_blank()
+    , axis.title = element_blank()
+    , panel.grid.major = element_line(color = '#E4AA84', size = 0.5, linetype=1)
+    , panel.grid.minor = element_line(color = '#E4AA84', size = 0.25, linetype=1)
+    , plot.caption = element_text(hjust = 0, color = 'dark gray')
+  ) +
+  scale_color_manual(values=c('black','#8F0F01'))
+```
+
+The piece that puts the icing on the cake here in terms of making the font look more like handwriting and the background look more like paper is set with `paint_pomological`.
+
+```{r}
+paint_pomological(
+  plt
+  , res = 110
+  , width = 180 * 5
+  , height = 220 * 5
+)
+```
+
+And there ya go :)
+
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964_small.png")
+
+```
+
+
+

@@ -132,7 +132,7 @@ glimpse(td)</code></pre>
 <li><p>Direction indicates whether the train is moving from SF -&gt; San Jose or vice-versa.</p></li>
 </ol>
 <p>Let’s start by coercing the the different timestamps to the same timestamp format. For this we’ll use the <code>lubridate::parse_time()</code> function.</p>
-<p>The timestamps for the intermediate stations are in the format <code>%I:%M%p</code> e.g. <code>7:04am</code>.</p>
+<p>The timestamps for the intermediate stations are in the format <code>%I:%M%p</code> e.g. <code>7:04am</code>.</p>
 <p>The SF and San Jose columns are in the more straightforward <code>%H:%M:%s</code> format.</p>
 <p>We’ll convert these before we visualize. For now, we’ll convert all <code>time</code> columns to a character.</p>
 <pre class="r"><code>td %&lt;&gt;%

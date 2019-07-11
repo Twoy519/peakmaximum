@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		<meta name="description" content="A website built through Hugo and blogdown.">
-		<meta name="generator" content="Hugo 0.31.1" />
+		<meta name="generator" content="Hugo 0.54.0" />
 		<title>Visualizing Prophet&#39;s changepoint.prior.scale &middot; Maximuming At The Peak</title>
 		<link rel="shortcut icon" href="/images/favicon.ico">
 		<link rel="stylesheet" href="/css/style.css">
@@ -44,8 +44,8 @@
                     </h1>
                     <h2 class="headline">
                     Dec 2018
-                    · 1036 words
-                    · 5 minutes read
+                    · 1206 words
+                    · 6 minutes read
                       <span class="tags">
                       
                       
@@ -71,7 +71,10 @@
                 </header>
                 
                 <section id="post-body">
-                    <p><img src="/img/changepoint_gif.gif" width="300px" style="display: block; margin: auto;" /></p>
+                    
+
+
+<p><img src="/img/changepoint_gif.gif" width="300px" style="display: block; margin: auto;" /></p>
 <p>As a followup to my <a href="https://peakmaximum.com/2018/12/22/visualizing-prophet-with-gganimate/">post about visualizing Prophet Forecast Output</a>, this post will do the same process of combing purrr/furrr and prophet to run a lot of forecasts in a more structured way and then visualizing the results with <code>gganimate</code>.</p>
 <p>The purpose of this post will be to provide a range of input values to the <code>changepoint.prior.scale</code> parameter and observe what it does to Prophet’s forecast and it’s confidence intervals. The output will be the gif at the top of this post.</p>
 <div id="step-1-fetch-data" class="section level1">
@@ -281,6 +284,42 @@ library( &#39;ggplot2&#39;)
 
 gganimate::animate(forecast_plot, width = 800, height = 450)</code></pre>
 <p><img src="/img/changepoint_gif.gif" style="display: block; margin: auto;" /></p>
+<p>data.frame(stringsAsFactors=FALSE,
+is_strategic_publisher = c(“FALSE”, “FALSE”, “Strategic Publisher”,
+“Strategic Publisher”, “FALSE”, “FALSE”,
+“Strategic Publisher”, “Strategic Publisher”, “FALSE”,
+“FALSE”, “Strategic Publisher”, “Strategic Publisher”,
+“FALSE”),
+is_price_target_gkd = c(“FALSE”, “Price Target GK”, “FALSE”,
+“Price Target GK”, “FALSE”, “Price Target GK”,
+“FALSE”, “Price Target GK”, “FALSE”,
+“Price Target GK”, “FALSE”, “Price Target GK”, “FALSE”),
+is_instant_game = c(“FALSE”, “FALSE”, “FALSE”, “FALSE”,
+“Instant Game”, “Instant Game”, “Instant Game”,
+“Instant Game”, “FALSE”, “FALSE”, “FALSE”, “FALSE”,
+“Instant Game”),
+is_on_deal = c(“FALSE”, “FALSE”, “FALSE”, “FALSE”, “FALSE”,
+“FALSE”, “FALSE”, “FALSE”, “On Special Deal”,
+“On Special Deal”, “On Special Deal”,
+“On Special Deal”, “On Special Deal”),
+revenue = c(3098973.839, 134344.5206, 389442.3291,
+63739.7426, 526481.4639, 104.4025, 43107.5236,
+107.7166, 1183066.049, 40502.7935, 297819.8632,
+47412.4123, 184.7481),
+plcmnt_block_rev = c(351531.4012, 5207.870338, 43937.98183,
+378.708137, 80211.25638, 101.433881, 1658.179125,
+80.106454, 14686.34642, 20.331771, 21327.00827,
+215.032453, 2.727782),
+junk_plcmnt_rev = c(518539.5493, 5957.97372, 44824.17004, 1681.38089,
+76094.51516, 54.38616, 1059.78123, 80.10645,
+21263.54786, 92.18246, 44827.10941, 927.56042,
+17.72442),
+junk_bundle_rev = c(371317.8251, 6256.35166, 37220.02662, 129.05396,
+51844.0761, 4681.92585, 774.5724, 84.6493,
+53949.75611, 4677.72274, 31801.47748, 78.82074, 0),
+num_bundles = c(13050L, 137L, 314L, 43L, 1903L, 10L, 27L, 2L,
+1214L, 35L, 106L, 34L, 2L)
+)</p>
 </div>
 </div>
 
@@ -297,7 +336,7 @@ gganimate::animate(forecast_plot, width = 800, height = 450)</code></pre>
     
     <p class="small">
     
-       © Copyright 2018 <i class="fa fa-heart" aria-hidden="true"></i> 
+       © Copyright 2019 <i class="fa fa-heart" aria-hidden="true"></i> 
     
     </p>
     <p class="small">
@@ -316,14 +355,17 @@ gganimate::animate(forecast_plot, width = 800, height = 450)</code></pre>
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-108019207-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108019207-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

@@ -29,6 +29,15 @@
     </item>
     
     <item>
+      <title>Dataviz</title>
+      <link>/categories/dataviz/</link>
+      <pubDate>Thu, 11 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/dataviz/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Forecasting</title>
       <link>/categories/forecasting/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
@@ -79,6 +88,15 @@
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Rstats</title>
+      <link>/categories/rstats/</link>
+      <pubDate>Thu, 11 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/rstats/</guid>
       <description></description>
     </item>
     

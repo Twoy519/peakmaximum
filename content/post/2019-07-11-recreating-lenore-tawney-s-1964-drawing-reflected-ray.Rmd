@@ -60,7 +60,7 @@ One of the more tedious parts of this that I'm leaving out is actually the gener
 I uploaded the file to my repo for this site:
 
 ```{r}
-d.in <- readr::read_csv('https://raw.githubusercontent.com/Twoy519/peakmaximum/master/reflected_ray_data.csv')
+d.in <- readr::read_csv('https://raw.githubusercontent.com/Twoy519/peakmaximum/master/data_assets/reflected_ray_data.csv')
 
 head(d.in)
 ```

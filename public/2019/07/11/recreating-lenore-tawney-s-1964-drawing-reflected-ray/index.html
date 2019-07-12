@@ -66,96 +66,7 @@
                 <section id="post-body">
                     
                     
-
-
-<p><img src="/img/lenore_tawney_reflected_ray_1964.png" width="300px" style="display: block; margin: auto;" /></p>
-<div id="background" class="section level1">
-<h1>Background</h1>
-<p>My wife and I moved to London in early 2017. One of the first things we did when we got here was visit the Tate Museum. While there, I walked by a subtle trio of drawings by an artist I had never heard of. I took a photo of my favorite and kept walking.</p>
-<p>It is about two years later (July 2019) and we now have a five month old daughter. We immediately started to back up every photo we ever took of anything. It was during this process that I stumbled upon my original image:</p>
-<p><img src="/img/lenore_tawney_iphone_photo.jpg" width="300px" style="display: block; margin: auto;" /></p>
-<p>The artist is <a href="https://www.tate.org.uk/art/artists/lenore-tawney-24528">Lenore Tawney</a>, an American who worked in the mid-20th century. She is actually more well-known for her work with “fiber” and yarn but she has what I think is a <a href="http://lenoretawney.org/lenore-tawney/work/drawing/">beautiful collection of Ink Drawings</a>.</p>
-<p>The one I captured at the Tate that day in 2017 is called <a href="https://www.tate.org.uk/art/artworks/tawney-reflected-ray-l03880">“Reflected Ray”</a>. I loved the geometry and simplicity of this work. The medium of simple ink on 1960’s industrial draft paper I thought was also really beautiful and cool.</p>
-</div>
-<div id="using-ggpomological" class="section level1">
-<h1>Using <a href="https://github.com/gadenbuie/ggpomological">ggpomological</a></h1>
-<p>I ran into <a href="https://github.com/gadenbuie/ggpomological">ggpomological</a> a while ago and I thought it looked awesome. Unfortunately, I didn’t see much application in the work environment where I spend 99% of my R time. When I was looking at the Lenore Tawney artwork again today though I thought it would be a fun application of the <a href="https://github.com/gadenbuie/ggpomological"><code>paint_pomological()</code> feature</a> which uses <code>magick</code> to give a ggplot output the look of hand-drawing on paper. In this demo I’ll use this feature to make a pretty cool rendering of Lenore Tawney’s Reflected Ray in ggplot.</p>
-</div>
-<div id="r-code" class="section level1">
-<h1>R Code</h1>
-<p>We’ll use ggplot2 for plotting, and ggpomological for the theme and paper effect.</p>
-<pre class="r"><code>require( &#39;ggplot2&#39;)
-require( &#39;ggpomological&#39;)</code></pre>
-<p>In order to generate the dataset, I visually picked out the x and y coordinates for the main nodes, categorized the lines into some rough “groups” based on their color and what component of the entire illustration I thought they comprised, and then counted the number of lines between the nodes of that smaller component. I then evenly spaced lines in between the starting and ending nodes in order to generate the rough x and y coordinates for the entire component.</p>
-<p><img src="/img/tawney_drafting_screencap.png" width="300px" style="display: block; margin: auto;" /></p>
-<p>I uploaded the file with the resulting data to my repo for this site:</p>
-<pre class="r"><code>d.in &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/Twoy519/peakmaximum/master/data_assets/reflected_ray_data.csv&#39;)
-
-head(d.in)</code></pre>
-<pre><code>## # A tibble: 6 x 6
-##   line_group                     color    x1    y1    x2    y2
-##   &lt;chr&gt;                          &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 bottom_right_boundary_leftwing dark     15  24    80     16 
-## 2 bottom_left_boundary_left_wing dark     80  16   145     24 
-## 3 top_boundary_left_wing         dark     15 110    67    122 
-## 4 bottom_to_left_wing            dark     15  24    72    110 
-## 5 bottom_to_left_wing            dark     17  23.8  71.6  111.
-## 6 bottom_to_left_wing            dark     19  23.5  71.2  112.</code></pre>
-<p>I originally thought I was going to have to do something crazy with <code>geom_line</code> but a quick check for a better way revealed <code>geom_segment</code> to be a one-liner. Each line has a color as well as the starting point {x1, y1} and the ending point {x2, y2}. We can feed these coordinates into <code>geom_segment</code>’s x1, xend, y1 and yend aesthetics.</p>
-<div id="plot" class="section level2">
-<h2>Plot</h2>
-<p>The plot below follows this high-level logic:</p>
-<ol style="list-style-type: decimal">
-<li><p>We use <code>geom_segment</code> to pass the coordinates and the colors</p></li>
-<li><p>The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10’s. We pass <code>expand=c(0,0)</code> to the <code>scale_*_continuous</code> pieces in order to bring the axes right up to the edge of the plot area panel.</p></li>
-<li><p>I downloaded the font <a href="https://fonts.google.com/specimen/Homemade+Apple/">‘Homemade Apple’</a> which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into <code>theme_pomological_fancy()</code></p></li>
-<li><p>I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.</p></li>
-<li><p>I set the colors</p></li>
-</ol>
-<pre class="r"><code>plt &lt;- ggplot(d.in) +
-  geom_segment(aes(x=x1, y=y1, xend=x2, yend=y2, color=color), alpha = 0.2) +
-  scale_x_continuous(
-    limits = c(0,160)
-    , breaks = seq(0,160, by = 10)
-    , minor_breaks = seq(0,160, by = 1)
-    , expand = c(0,0)
-  ) +
-  scale_y_continuous(
-    limits = c(0,200)
-    , breaks = seq(0,200, by = 10)
-    , minor_breaks = seq(0,200, by = 1)
-    , expand = c(0,0)
-    , position=&#39;right&#39;
-  ) +
-  labs(
-    caption=&#39;Reflected ray&#39;
-  ) +
-  theme_pomological_fancy() +
-  theme(
-    legend.position = &#39;none&#39;
-    , axis.text = element_blank()
-    , axis.title = element_blank()
-    , panel.grid.major = element_line(color = &#39;#E4AA84&#39;, size = 0.5, linetype=1)
-    , panel.grid.minor = element_line(color = &#39;#E4AA84&#39;, size = 0.25, linetype=1)
-    , plot.caption = element_text(hjust = 0, color = &#39;dark gray&#39;)
-  ) +
-  scale_color_manual(values=c(&#39;black&#39;,&#39;#8F0F01&#39;))</code></pre>
-<p>Our plot looks like this with the default ggplot output</p>
-<pre class="r"><code>plt</code></pre>
-<p><img src="/post/2019-07-11-recreating-lenore-tawney-s-1964-drawing-reflected-ray_files/figure-html/unnamed-chunk-7-1.png" width="288" style="display: block; margin: auto;" /></p>
-<p>The piece that puts the icing on the cake here in terms of making the font look more like handwriting and the background look more like paper is set with <code>paint_pomological</code>.</p>
-<pre class="r"><code>paint_pomological(
-  plt
-  , res = 110
-  , width = 180 * 5
-  , height = 220 * 5
-)</code></pre>
-<p><img src="/post/2019-07-11-recreating-lenore-tawney-s-1964-drawing-reflected-ray_files/figure-html/unnamed-chunk-8-1.png" width="450" style="display: block; margin: auto;" /></p>
-<p> 🔥 And there ya go! 🔥</p>
-</div>
-</div>
-
-                
+                    
                     
 
 
@@ -197,11 +108,11 @@ head(d.in)</code></pre>
 <h2>Plot</h2>
 <p>The plot below follows this high-level logic:</p>
 <ol style="list-style-type: decimal">
-<li><p>We use <code>geom_segment</code> to pass the coordinates and the colors</p></li>
-<li><p>The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10’s. We pass <code>expand=c(0,0)</code> to the <code>scale_*_continuous</code> pieces in order to bring the axes right up to the edge of the plot area panel.</p></li>
-<li><p>I downloaded the font <a href="https://fonts.google.com/specimen/Homemade+Apple/">‘Homemade Apple’</a> which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into <code>theme_pomological_fancy()</code></p></li>
-<li><p>I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.</p></li>
-<li><p>I set the colors</p></li>
+<li>We use <code>geom_segment</code> to pass the coordinates and the colors</li>
+<li>The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10’s. We pass <code>expand=c(0,0)</code> to the <code>scale_*_continuous</code> pieces in order to bring the axes right up to the edge of the plot area panel.</li>
+<li>I downloaded the font <a href="https://fonts.google.com/specimen/Homemade+Apple/">‘Homemade Apple’</a> which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into <code>theme_pomological_fancy()</code></li>
+<li>I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.</li>
+<li>I set the colors</li>
 </ol>
 <pre class="r"><code>plt &lt;- ggplot(d.in) +
   geom_segment(aes(x=x1, y=y1, xend=x2, yend=y2, color=color), alpha = 0.2) +

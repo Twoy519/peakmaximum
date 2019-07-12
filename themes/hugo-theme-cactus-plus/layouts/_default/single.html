@@ -37,9 +37,9 @@
                         avoid behavior where p tags are placed in ordered lists
                         https://discourse.gohugo.io/t/replace-html-content-from-hugo-pipes/16053
                     -->
-                    {{ replace .Content "<p></p>" "" | safeHTML }}
-                
-                    {{ .Content }}
+                    {{ $content := replace .Content "<li><p>" "<li>" }}
+                    {{ $content = replace $content "</p></li>" "</li>" | safeHTML }}
+                    {{ $content }}
                 </section>
             </article>
 

@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
     , message = FALSE
     , warning = FALSE
     , error = FALSE
-    , cache = TRUE
+    , cache = FALSE
   )
 
 ```
@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 ```{r, echo = FALSE, out.width = "300px"}
 
-knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964_small.png")
+knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964.png")
 
 ```
 
@@ -80,7 +80,7 @@ I did a bad job naming all the line segment groups, but basically each line has 
 
 * I set the colors
 
-```{r}
+```{r, cache=F}
 plt <- ggplot(d.in) +
   geom_segment(aes(x=x1, y=y1, xend=x2, yend=y2, color=color), alpha = 0.2) +
   scale_x_continuous(
@@ -109,6 +109,7 @@ plt <- ggplot(d.in) +
     , plot.caption = element_text(hjust = 0, color = 'dark gray')
   ) +
   scale_color_manual(values=c('black','#8F0F01'))
+
 ```
 
 Our plot looks like this with the default ggplot output

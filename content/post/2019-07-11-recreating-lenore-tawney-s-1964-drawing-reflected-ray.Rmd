@@ -50,10 +50,9 @@ I ran into [ggpomological](https://github.com/gadenbuie/ggpomological) a while a
 
 # R Code
 
-We'll use dplyr for data-munging, ggplot2 for plotting, and ggpomological for the theme and paper effect.
+We'll use ggplot2 for plotting, and ggpomological for the theme and paper effect.
 
 ```{r}
-require( 'dplyr')
 require( 'ggplot2')
 require( 'ggpomological')
 ```

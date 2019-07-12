@@ -32,7 +32,7 @@ knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964.png")
 
 My wife and I moved to London in early 2017. One of the first things we did when we got here was visit the Tate Museum. While there, I walked by a subtle trio of drawings by an artist I had never heard of. I took a photo of my favorite and kept walking.
 
-It is about a year and a half later now (July 2019), and we now have a five month old daughter. One of the first things we did when she was born was to back up every photo we've ever taken of anything. It was during this process that I stumbled upon my original image:
+It is about two years later (July 2019) and we now have a five month old daughter. We immediately started to back up every photo we've ever took of anything. It was during this process that I stumbled upon my original image:
 
 ```{r, echo = FALSE, out.width = "300px"}
 

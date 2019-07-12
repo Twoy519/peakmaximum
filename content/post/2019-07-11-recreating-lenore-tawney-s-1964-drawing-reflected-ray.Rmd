@@ -80,7 +80,7 @@ I originally thought I was going to have to do something crazy with `geom_line` 
 
 The plot below follows this high-level logic:
 
-1. We use `geom_segment` to pass the coordinates and the colors
+1. We can use `geom_segment` to pass the coordinates and the colors
 
 2. The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10's. We pass `expand=c(0,0)` to the `scale_*_continuous` pieces in order to bring the axes right up to the edge of the plot area panel.
 

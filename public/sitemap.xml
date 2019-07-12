@@ -53,13 +53,13 @@
   </url>
   
   <url>
-    <loc>/tags/data-mutation/</loc>
+    <loc>/categories/data-mutation/</loc>
     <lastmod>2017-12-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/categories/data-mutation/</loc>
+    <loc>/tags/data-mutation/</loc>
     <lastmod>2017-12-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -71,19 +71,13 @@
   </url>
   
   <url>
-    <loc>/tags/dataviz/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>/categories/dataviz/</loc>
     <lastmod>2019-07-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/forecasting/</loc>
+    <loc>/tags/dataviz/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -95,7 +89,7 @@
   </url>
   
   <url>
-    <loc>/tags/furrr/</loc>
+    <loc>/tags/forecasting/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -107,13 +101,19 @@
   </url>
   
   <url>
-    <loc>/tags/gganimate/</loc>
+    <loc>/tags/furrr/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/categories/gganimate/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/gganimate/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -143,19 +143,13 @@
   </url>
   
   <url>
-    <loc>/tags/prophet/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>/categories/prophet/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/purrr/</loc>
+    <loc>/tags/prophet/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -167,7 +161,7 @@
   </url>
   
   <url>
-    <loc>/tags/r/</loc>
+    <loc>/tags/purrr/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -179,13 +173,19 @@
   </url>
   
   <url>
-    <loc>/tags/rstats/</loc>
-    <lastmod>2019-07-11T00:00:00+00:00</lastmod>
+    <loc>/tags/r/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/categories/rstats/</loc>
+    <lastmod>2019-07-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/rstats/</loc>
     <lastmod>2019-07-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>

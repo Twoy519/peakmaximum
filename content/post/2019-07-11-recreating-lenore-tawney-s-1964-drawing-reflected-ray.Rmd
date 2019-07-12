@@ -1,6 +1,7 @@
 ---
 title: Recreating Lenore Tawney's 1964 Drawing 'Reflected Ray'
 author: "Troy Porter"
+description: "Using `ggpomological` to make plots more realistic"
 date: '2019-07-11'
 slug: recreating-lenore-tawney-s-1964-drawing-reflected-ray
 categories: ['rstats','dataviz']

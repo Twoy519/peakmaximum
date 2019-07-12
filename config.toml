@@ -21,7 +21,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
 	  enableGoogleAnalytics = true
-    description = "A website built through Hugo and blogdown."
+    description = "Mostly Pretty Graphs Made With R"
 
     # options for highlight.js (version, additional languages, and theme)
     highlightjsVersion = "9.11.0"

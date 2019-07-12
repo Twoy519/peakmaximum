@@ -1,4 +1,5 @@
     {{ partial "head.html" . }}
+
     <body>
        {{ partial "nav.html" . }}
 
@@ -31,6 +32,13 @@
                   {{ end }}
                 {{ end }}
                 <section id="post-body">
+                    <!--
+                        stripping all the p tags from the page in order to
+                        avoid behavior where p tags are placed in ordered lists
+                        https://discourse.gohugo.io/t/replace-html-content-from-hugo-pipes/16053
+                    -->
+                    {{ replace .Content "<p></p>" "" | safeHTML }}
+                
                     {{ .Content }}
                 </section>
             </article>

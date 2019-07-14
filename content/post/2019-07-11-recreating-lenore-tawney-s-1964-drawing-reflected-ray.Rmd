@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 ```{r, echo = FALSE, out.width = "300px"}
 
-knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964.png")
+knitr::include_graphics("/img/lenore_tawney_reflected_ray_1964_resized.jpg")
 
 ```
 
@@ -147,6 +147,6 @@ And then just for fun we'll Andy Warhol it up
 
 ```{r, echo = FALSE, out.width = "300px"}
 
-knitr::include_graphics("/img/lenore_tawney_palettes.png")
+knitr::include_graphics("/img/lenore_tawney_palettes_small.jpg")
 
 ```

@@ -5,8 +5,7 @@ description: "Using `ggpomological` to make plots more realistic"
 date: '2019-07-11'
 slug: recreating-lenore-tawney-s-1964-drawing-reflected-ray
 categories: ['rstats','dataviz']
-images:
-  - /img/lenore_tawney_reflected_ray_1964_resized.jpg
+og_image: '/img/lenore_tawney_reflected_ray_1964_resized.jpg'
 tags: ['rstats','ggplot','ggpomological']
 ---
 
@@ -87,7 +86,7 @@ head(d.in)</code></pre>
   scale_color_manual(values=c(&#39;black&#39;,&#39;#8F0F01&#39;))</code></pre>
 <p>Our plot looks like this with the default ggplot output</p>
 <pre class="r"><code>plt</code></pre>
-<p><img src="/post/2019-07-11-recreating-lenore-tawney-s-1964-drawing-reflected-ray_files/figure-html/unnamed-chunk-7-1.png" width="288" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2019-07-11-recreating-lenore-tawney-s-1964-drawing-reflected-ray_files/figure-html/unnamed-chunk-8-1.png" width="288" style="display: block; margin: auto;" /></p>
 <p>The piece that puts the icing on the cake here in terms of making the font look more like handwriting and the background look more like paper is set with <code>paint_pomological</code>.</p>
 <pre class="r"><code>paint_pomological(
   plt
@@ -95,7 +94,7 @@ head(d.in)</code></pre>
   , width = 180 * 5
   , height = 220 * 5
 )</code></pre>
-<p><img src="/post/2019-07-11-recreating-lenore-tawney-s-1964-drawing-reflected-ray_files/figure-html/unnamed-chunk-8-1.png" width="450" style="display: block; margin: auto;" /></p>
+<p><img src="/post/2019-07-11-recreating-lenore-tawney-s-1964-drawing-reflected-ray_files/figure-html/unnamed-chunk-9-1.png" width="450" style="display: block; margin: auto;" /></p>
 <p> 🔥 And there ya go! 🔥</p>
 <p>And then just for fun we’ll Andy Warhol it up</p>
 <p><img src="/img/lenore_tawney_palettes_small.jpg" width="300px" style="display: block; margin: auto;" /></p>

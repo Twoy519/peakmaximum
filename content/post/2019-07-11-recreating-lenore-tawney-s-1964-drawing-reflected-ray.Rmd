@@ -5,8 +5,7 @@ description: "Using `ggpomological` to make plots more realistic"
 date: '2019-07-11'
 slug: recreating-lenore-tawney-s-1964-drawing-reflected-ray
 categories: ['rstats','dataviz']
-images:
-  - /img/lenore_tawney_reflected_ray_1964_resized.jpg
+og_image: '/img/lenore_tawney_reflected_ray_1964_resized.jpg'
 tags: ['rstats','ggplot','ggpomological']
 ---
 
@@ -19,6 +18,10 @@ knitr::opts_chunk$set(
     , error = FALSE
     , cache = FALSE
   )
+
+```
+
+```{r}
 
 ```
 

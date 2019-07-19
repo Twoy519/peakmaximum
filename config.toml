@@ -1,4 +1,4 @@
-baseurl = "/"
+baseURL = "https://peakmaximum.com/"
 languageCode = "en-us"
 title = "Maximuming At The Peak"
 theme = "hugo-theme-cactus-plus"
@@ -29,9 +29,9 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     highlightjsLang = ["r", "yaml"]
     highlightjsTheme = "dark"
     
-    highlight="github"
+    # highlight="github"
     # highlight="dark"
-    # highlight="arta"
+    highlight="arta"
     # highlight="hybrid"
 
     MathJaxCDN = "//cdn.bootcss.com"

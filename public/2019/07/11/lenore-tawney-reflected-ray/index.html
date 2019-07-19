@@ -1,14 +1,76 @@
----
-title: Recreating Lenore Tawney's 1964 Drawing 'Reflected Ray'
-author: "Troy Porter"
-description: "Using `ggpomological` to make plots more realistic"
-date: '2019-07-11'
-slug: lenore-tawney-reflected-ray
-categories: ['rstats','dataviz']
-og_image: '/img/lenore_tawney_reflected_ray_1964_resized.jpg'
-tags: ['rstats','ggplot','ggpomological']
----
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="Mostly Pretty Graphs Made With R">
+		<meta name="generator" content="Hugo 0.54.0" />
+		<title>Recreating Lenore Tawney&#39;s 1964 Drawing &#39;Reflected Ray&#39; &middot; Maximuming At The Peak</title>
+		<link rel="shortcut icon" href="/images/favicon.ico">
+		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/highlight.css">
+		
+		
+		<meta property="og:image" content="/img/lenore_tawney_reflected_ray_1964_resized.jpg"/>
+		<meta property="og:image:secure_url" content="/img/lenore_tawney_reflected_ray_1964_resized.jpg"/>
 
+		
+		<link rel="stylesheet" href="/css/monosocialiconsfont.css">
+		
+
+		
+	</head>
+
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='/post'>Archive</a>
+	<a href='/tags'>Tags</a>
+	<a href='/about'>About</a>
+
+	
+
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Recreating Lenore Tawney&#39;s 1964 Drawing &#39;Reflected Ray&#39;
+                    </h1>
+                    <h2 class="headline">
+                    Jul 2019
+                    · 829 words
+                    · 4 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="/tags/rstats">rstats</a>
+                          
+                              <a href="/tags/ggplot">ggplot</a>
+                          
+                              <a href="/tags/ggpomological">ggpomological</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+                    
+                    
+                    
 
 
 <p><img src="/img/lenore_tawney_reflected_ray_1964_resized.jpg" width="300px" style="display: block; margin: auto;" /></p>
@@ -49,11 +111,11 @@ head(d.in)</code></pre>
 <h2>Plot</h2>
 <p>The plot below follows this high-level logic:</p>
 <ol style="list-style-type: decimal">
-<li><p>We can use <code>geom_segment</code> to pass the coordinates and the colors</p></li>
-<li><p>The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10’s. We pass <code>expand=c(0,0)</code> to the <code>scale_*_continuous</code> pieces in order to bring the axes right up to the edge of the plot area panel.</p></li>
-<li><p>I downloaded the font <a href="https://fonts.google.com/specimen/Homemade+Apple/">‘Homemade Apple’</a> which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into <code>theme_pomological_fancy()</code></p></li>
-<li><p>I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.</p></li>
-<li><p>I set the colors</p></li>
+<li>We can use <code>geom_segment</code> to pass the coordinates and the colors</li>
+<li>The original artwork is basically a 160 wide by 200 tall grid, with the major gridlines breaking on the 10’s. We pass <code>expand=c(0,0)</code> to the <code>scale_*_continuous</code> pieces in order to bring the axes right up to the edge of the plot area panel.</li>
+<li>I downloaded the font <a href="https://fonts.google.com/specimen/Homemade+Apple/">‘Homemade Apple’</a> which looked good enough to pass for the title of the piece in the bottom left. This is passed by default into <code>theme_pomological_fancy()</code></li>
+<li>I turn off the axis labels, format the major and minor grid components, and stick the caption in the bottom left.</li>
+<li>I set the colors</li>
 </ol>
 <pre class="r"><code>plt &lt;- ggplot(d.in) +
   geom_segment(aes(x=x1, y=y1, xend=x2, yend=y2, color=color), alpha = 0.2) +
@@ -100,3 +162,55 @@ head(d.in)</code></pre>
 <p><img src="/img/lenore_tawney_palettes_small.jpg" width="300px" style="display: block; margin: auto;" /></p>
 </div>
 </div>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2019 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="/js/jquery-2.2.4.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108019207-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+
+
+
+    </body>
+</html>

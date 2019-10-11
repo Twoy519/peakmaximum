@@ -1,0 +1,88 @@
+---
+title: Walking Over Dimensions For Plotting
+author: "Troy Porter"
+date: '2019-10-11'
+description: "How to pass column names to purrr::walk() to plot over multiple dataframe columns"
+slug: walking-over-dimensions-for-plotting
+categories: ['rstats','dataviz','purrr','rlang']
+tags: ['rstats','dataviz','purrr','rlang']
+og_image: 'img/silly_walks.png'
+---
+
+```{r global_options, include=FALSE}
+
+knitr::opts_chunk$set(
+    fig.align = 'center'
+    , message = FALSE
+    , warning = FALSE
+    , error = FALSE
+    , cache = FALSE
+  )
+
+```
+
+```{r, echo = FALSE, out.width = "300px"}
+
+knitr::include_graphics("/img/silly_walks.png")
+
+```
+
+<!-- # Background -->
+
+```{r}
+# fbr::with_proxy(devtools::install_github('hadley/nycflights13'))
+library(nycflights13)
+library(dplyr)
+library(ggplot2)
+library(rlang) # for sym()
+library(purrr) # for walk()
+```
+
+```{r}
+ggthemr::ggthemr(palette='flat', type='outer')
+plot_group <- function(group_var) {
+  x <- flights %>%
+    group_by(!!sym(group_var)) %>% 
+    tally(name='n_flights') %>% 
+    arrange(-n_flights) %>%
+    mutate(
+      d = as.factor(!!sym(group_var)),
+      d_lumped = forcats::fct_lump(
+          d,
+          n = 9,
+          w = n_flights
+        )
+        , na_level = 'Other'
+    ) %>%
+    group_by(d_lumped) %>%
+    summarise(n_flights = sum(n_flights)) %>%
+    ungroup() %>%
+    mutate(
+      d_lumped=forcats::fct_reorder(d_lumped, n_flights)
+    )
+  
+  p <- ggplot(
+    x
+    , aes( x = d_lumped, y = n_flights)
+  ) +
+    geom_col() +
+    scale_y_continuous(labels = scales::comma) +
+    coord_flip() +
+    labs(
+      title = glue::glue('Number of Flights: {group_var}')
+      , x = glue::glue('{group_var}')
+      , y = 'Number of Flights'
+    ) +
+    theme(plot.background = element_rect(fill='#EBF0F1', color = 'grey'))
+  print(p)
+}
+
+```
+
+
+```{r}
+dims <- c('carrier','origin','dest')
+
+purrr::walk(dims, plot_group)
+
+```

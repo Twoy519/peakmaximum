@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Rstats on Maximuming At The Peak</title>
+    <title>rstats on Maximuming At The Peak</title>
     <link>/tags/rstats/</link>
-    <description>Recent content in Rstats on Maximuming At The Peak</description>
+    <description>Recent content in rstats on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 11 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 11 Oct 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/rstats/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Walking Over Dimensions For Plotting</title>
+      <link>/2019/10/11/walking-over-dimensions-for-plotting/</link>
+      <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/10/11/walking-over-dimensions-for-plotting/</guid>
+      <description># fbr::with_proxy(devtools::install_github(&amp;#39;hadley/nycflights13&amp;#39;)) library(nycflights13) library(dplyr) library(ggplot2) library(rlang) # for sym() library(purrr) # for walk() ggthemr::ggthemr(palette=&amp;#39;flat&amp;#39;, type=&amp;#39;outer&amp;#39;) plot_group &amp;lt;- function(group_var) { x &amp;lt;- flights %&amp;gt;% group_by(!!sym(group_var)) %&amp;gt;% tally(name=&amp;#39;n_flights&amp;#39;) %&amp;gt;% arrange(-n_flights) %&amp;gt;% mutate( d = as.factor(!!sym(group_var)), d_lumped = forcats::fct_lump( d, n = 9, w = n_flights ) , na_level = &amp;#39;Other&amp;#39; ) %&amp;gt;% group_by(d_lumped) %&amp;gt;% summarise(n_flights = sum(n_flights)) %&amp;gt;% ungroup() %&amp;gt;% mutate( d_lumped=forcats::fct_reorder(d_lumped, n_flights) ) p &amp;lt;- ggplot( x , aes( x = d_lumped, y = n_flights) ) + geom_col() + scale_y_continuous(labels = scales::comma) + coord_flip() + labs( title = glue::glue(&amp;#39;Number of Flights: {group_var}&amp;#39;) , x = glue::glue(&amp;#39;{group_var}&amp;#39;) , y = &amp;#39;Number of Flights&amp;#39; ) + theme(plot.</description>
+    </item>
     
     <item>
       <title>Recreating Lenore Tawney&#39;s 1964 Drawing &#39;Reflected Ray&#39;</title>

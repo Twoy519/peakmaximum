@@ -6,16 +6,44 @@
     <description>Recent content in Categories on Maximuming At The Peak</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Fri, 11 Oct 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Data Mutation</title>
-      <link>/categories/data-mutation/</link>
-      <pubDate>Thu, 07 Dec 2017 00:00:00 +0000</pubDate>
+      <title>dataviz</title>
+      <link>/categories/dataviz/</link>
+      <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>/categories/data-mutation/</guid>
+      <guid>/categories/dataviz/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>purrr</title>
+      <link>/categories/purrr/</link>
+      <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/purrr/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rlang</title>
+      <link>/categories/rlang/</link>
+      <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/rlang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rstats</title>
+      <link>/categories/rstats/</link>
+      <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/rstats/</guid>
       <description></description>
     </item>
     
@@ -29,15 +57,6 @@
     </item>
     
     <item>
-      <title>Dataviz</title>
-      <link>/categories/dataviz/</link>
-      <pubDate>Thu, 11 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/categories/dataviz/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Forecasting</title>
       <link>/categories/forecasting/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
@@ -47,7 +66,7 @@
     </item>
     
     <item>
-      <title>Furrr</title>
+      <title>furrr</title>
       <link>/categories/furrr/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
@@ -56,7 +75,7 @@
     </item>
     
     <item>
-      <title>Gganimate</title>
+      <title>gganimate</title>
       <link>/categories/gganimate/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
@@ -74,15 +93,6 @@
     </item>
     
     <item>
-      <title>Purrr</title>
-      <link>/categories/purrr/</link>
-      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>/categories/purrr/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>R</title>
       <link>/categories/r/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
@@ -92,11 +102,11 @@
     </item>
     
     <item>
-      <title>Rstats</title>
-      <link>/categories/rstats/</link>
-      <pubDate>Thu, 11 Jul 2019 00:00:00 +0000</pubDate>
+      <title>Data Mutation</title>
+      <link>/categories/data-mutation/</link>
+      <pubDate>Thu, 07 Dec 2017 00:00:00 +0000</pubDate>
       
-      <guid>/categories/rstats/</guid>
+      <guid>/categories/data-mutation/</guid>
       <description></description>
     </item>
     

@@ -1,0 +1,62 @@
+---
+title: Walking Over Dimensions For Plotting
+author: "Troy Porter"
+date: '2019-10-11'
+description: "How to pass column names to purrr::walk() to plot over multiple dataframe columns"
+slug: walking-over-dimensions-for-plotting
+categories: ['rstats','dataviz','purrr','rlang']
+tags: ['rstats','dataviz','purrr','rlang']
+og_image: 'img/silly_walks.png'
+---
+
+
+
+<p><img src="/img/silly_walks.png" width="300px" style="display: block; margin: auto;" /></p>
+<!-- # Background -->
+<pre class="r"><code># fbr::with_proxy(devtools::install_github(&#39;hadley/nycflights13&#39;))
+library(nycflights13)
+library(dplyr)
+library(ggplot2)
+library(rlang) # for sym()
+library(purrr) # for walk()</code></pre>
+<pre class="r"><code>ggthemr::ggthemr(palette=&#39;flat&#39;, type=&#39;outer&#39;)
+plot_group &lt;- function(group_var) {
+  x &lt;- flights %&gt;%
+    group_by(!!sym(group_var)) %&gt;% 
+    tally(name=&#39;n_flights&#39;) %&gt;% 
+    arrange(-n_flights) %&gt;%
+    mutate(
+      d = as.factor(!!sym(group_var)),
+      d_lumped = forcats::fct_lump(
+          d,
+          n = 9,
+          w = n_flights
+        )
+        , na_level = &#39;Other&#39;
+    ) %&gt;%
+    group_by(d_lumped) %&gt;%
+    summarise(n_flights = sum(n_flights)) %&gt;%
+    ungroup() %&gt;%
+    mutate(
+      d_lumped=forcats::fct_reorder(d_lumped, n_flights)
+    )
+  
+  p &lt;- ggplot(
+    x
+    , aes( x = d_lumped, y = n_flights)
+  ) +
+    geom_col() +
+    scale_y_continuous(labels = scales::comma) +
+    coord_flip() +
+    labs(
+      title = glue::glue(&#39;Number of Flights: {group_var}&#39;)
+      , x = glue::glue(&#39;{group_var}&#39;)
+      , y = &#39;Number of Flights&#39;
+    ) +
+    theme(plot.background = element_rect(fill=&#39;#EBF0F1&#39;, color = &#39;grey&#39;))
+  print(p)
+}</code></pre>
+<pre class="r"><code>dims &lt;- c(&#39;carrier&#39;,&#39;origin&#39;,&#39;dest&#39;)
+
+purrr::walk(dims, plot_group)</code></pre>
+<p><img src="/post/2019-10-11-walking-over-dimensions-for-plotting_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="/post/2019-10-11-walking-over-dimensions-for-plotting_files/figure-html/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="/post/2019-10-11-walking-over-dimensions-for-plotting_files/figure-html/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>

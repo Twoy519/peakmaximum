@@ -48,7 +48,7 @@
                     </h1>
                     <h2 class="headline">
                     Oct 2019
-                    · 116 words
+                    · 133 words
                     · 1 minute read
                       <span class="tags">
                       
@@ -83,44 +83,47 @@ library(dplyr)
 library(ggplot2)
 library(rlang) # for sym()
 library(purrr) # for walk()</code></pre>
-<pre class="r"><code>ggthemr::ggthemr(palette=&#39;flat&#39;, type=&#39;outer&#39;)
+<pre class="r"><code>ggthemr::ggthemr(palette = &quot;flat&quot;, type = &quot;outer&quot;)
 plot_group &lt;- function(group_var) {
   x &lt;- flights %&gt;%
-    group_by(!!sym(group_var)) %&gt;% 
-    tally(name=&#39;n_flights&#39;) %&gt;% 
+    # !!sym() isn&#39;t recommended
+    # see https://twitter.com/hadleywickham/status/1182624340887638016
+    # group_by(!!sym(group_var)) %&gt;%
+    group_by(.data[[group_var]]) %&gt;% 
+    tally(name = &quot;n_flights&quot;) %&gt;%
     arrange(-n_flights) %&gt;%
     mutate(
       d = as.factor(!!sym(group_var)),
       d_lumped = forcats::fct_lump(
-          d,
-          n = 9,
-          w = n_flights
-        )
-        , na_level = &#39;Other&#39;
+        d,
+        n = 9,
+        w = n_flights
+      ),
+      na_level = &quot;Other&quot;
     ) %&gt;%
     group_by(d_lumped) %&gt;%
     summarise(n_flights = sum(n_flights)) %&gt;%
     ungroup() %&gt;%
     mutate(
-      d_lumped=forcats::fct_reorder(d_lumped, n_flights)
+      d_lumped = forcats::fct_reorder(d_lumped, n_flights)
     )
-  
+
   p &lt;- ggplot(
-    x
-    , aes( x = d_lumped, y = n_flights)
+    x,
+    aes(x = d_lumped, y = n_flights)
   ) +
     geom_col() +
     scale_y_continuous(labels = scales::comma) +
     coord_flip() +
     labs(
-      title = glue::glue(&#39;Number of Flights: {group_var}&#39;)
-      , x = glue::glue(&#39;{group_var}&#39;)
-      , y = &#39;Number of Flights&#39;
+      title = glue::glue(&quot;Number of Flights: {group_var}&quot;),
+      x = glue::glue(&quot;{group_var}&quot;),
+      y = &quot;Number of Flights&quot;
     ) +
-    theme(plot.background = element_rect(fill=&#39;#EBF0F1&#39;, color = &#39;grey&#39;))
+    theme(plot.background = element_rect(fill = &quot;#EBF0F1&quot;, color = &quot;grey&quot;))
   print(p)
 }</code></pre>
-<pre class="r"><code>dims &lt;- c(&#39;carrier&#39;,&#39;origin&#39;,&#39;dest&#39;)
+<pre class="r"><code>dims &lt;- c(&quot;carrier&quot;, &quot;origin&quot;, &quot;dest&quot;)
 
 purrr::walk(dims, plot_group)</code></pre>
 <p><img src="/post/2019-10-11-walking-over-dimensions-for-plotting_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="/post/2019-10-11-walking-over-dimensions-for-plotting_files/figure-html/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="/post/2019-10-11-walking-over-dimensions-for-plotting_files/figure-html/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>

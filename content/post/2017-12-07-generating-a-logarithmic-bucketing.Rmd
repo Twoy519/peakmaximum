@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
     , message = FALSE
     , warning = FALSE
     , error = FALSE
-    , cache = TRUE
+    , cache = FALSE
   )
 
 ```
@@ -69,18 +69,11 @@ That was better. But that obviously still sucks.
 
 This type of binning in R is easy with R's syntax `10^(1:n)`.
 
-So let's generate a lognormal distribution with some really high outliers. Credit [here](https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/) for the way to do this. The numbers I'm using for the mean (`m`) and standard deviation (`s`) are random. I chose them just to generate a distribution in the desired shape.
+So let's generate a lognormal distribution with some really high outliers.
 
 ```{r generate_impressions}
 
-m <- 2000
-s <- 40000
-
-location <- log(m^2 / sqrt(s^2 + m^2))
-
-shape <- sqrt(log(1 + (s^2 / m^2)))
-
-impressions <- data.frame(rlnorm(n=1000000, location, shape))
+impressions <- data.frame(rlnorm(n=100000, meanlog = log(100000), sdlog=log(5)))
 
 names( impressions) <-'imps'
 
@@ -161,7 +154,7 @@ ggplot(
   , aes(x=bucket, y = pct_imps)
 ) +
   geom_col(fill='#ed4956') +
-  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  geom_text(aes(label=scales::percent(pct_imps, accuracy = 1)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs( title='Percentage of Imps by Bucket') +
@@ -176,7 +169,7 @@ ggplot(
   , aes(x=bucket, y = pct_observations)
 ) +
   geom_col(fill='#3b5998') +
-  geom_text(aes(label=scales::percent(pct_observations)), nudge_y = 0.02) +
+  geom_text(aes(label=scales::percent(pct_observations, accuracy = 1)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs( title='Percentage of Observations by Bucket') +

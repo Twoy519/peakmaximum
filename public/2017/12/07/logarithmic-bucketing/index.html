@@ -48,7 +48,7 @@
                     </h1>
                     <h2 class="headline">
                     Dec 2017
-                    · 609 words
+                    · 568 words
                     · 3 minutes read
                       <span class="tags">
                       
@@ -73,10 +73,13 @@
                     
 <script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
 <script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
 <script src="/rmarkdown-libs/datatables-binding/datatables.js"></script>
 <link href="/rmarkdown-libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
 <link href="/rmarkdown-libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
 <script src="/rmarkdown-libs/dt-core/js/jquery.dataTables.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
 
 
 <p><img src="/img/its_log.png" width="300px" style="display: block; margin: auto;" /></p>
@@ -112,26 +115,19 @@ COPY / PASTE HERE:
   )</code></pre>
 <p>That was better. But that obviously still sucks.</p>
 <p>This type of binning in R is easy with R’s syntax <code>10^(1:n)</code>.</p>
-<p>So let’s generate a lognormal distribution with some really high outliers. Credit <a href="https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/">here</a> for the way to do this. The numbers I’m using for the mean (<code>m</code>) and standard deviation (<code>s</code>) are random. I chose them just to generate a distribution in the desired shape.</p>
-<pre class="r"><code>m &lt;- 2000
-s &lt;- 40000
-
-location &lt;- log(m^2 / sqrt(s^2 + m^2))
-
-shape &lt;- sqrt(log(1 + (s^2 / m^2)))
-
-impressions &lt;- data.frame(rlnorm(n=1000000, location, shape))
+<p>So let’s generate a lognormal distribution with some really high outliers.</p>
+<pre class="r"><code>impressions &lt;- data.frame(rlnorm(n=100000, meanlog = log(100000), sdlog=log(5)))
 
 names( impressions) &lt;-&#39;imps&#39;
 
 head( impressions)</code></pre>
-<pre><code>##          imps
-## 1   117.05296
-## 2   650.17365
-## 3    80.80932
-## 4  2006.32298
-## 5    16.63146
-## 6 14139.12628</code></pre>
+<pre><code>##         imps
+## 1   4900.182
+## 2  55144.003
+## 3 409891.498
+## 4 163868.240
+## 5  27864.676
+## 6 731740.292</code></pre>
 <p>You can see this is pretty heavily biased to the low end:</p>
 <pre class="r"><code>library( ggplot2)
 
@@ -161,13 +157,13 @@ impressions %&lt;&gt;%
   )
 
 head(impressions)</code></pre>
-<pre><code>##          imps     bucket
-## 1   117.05296   &lt;= 1,000
-## 2   650.17365   &lt;= 1,000
-## 3    80.80932     &lt;= 100
-## 4  2006.32298  &lt;= 10,000
-## 5    16.63146     &lt;= 100
-## 6 14139.12628 &lt;= 100,000</code></pre>
+<pre><code>##         imps       bucket
+## 1   4900.182    &lt;= 10,000
+## 2  55144.003   &lt;= 100,000
+## 3 409891.498 &lt;= 1,000,000
+## 4 163868.240 &lt;= 1,000,000
+## 5  27864.676   &lt;= 100,000
+## 6 731740.292 &lt;= 1,000,000</code></pre>
 <p>Let’s see how many imps are in each bucket</p>
 <pre class="r"><code>bucketed &lt;- impressions %&gt;% 
   dplyr::group_by(bucket) %&gt;% 
@@ -189,14 +185,14 @@ DT::datatable(bucketed, options = list(dom=&#39;t&#39;)) %&gt;%
   formatCurrency(&#39;imps&#39;,currency=&#39;&#39;,digits=0) %&gt;% 
   formatPercentage(c(&#39;pct_imps&#39;,&#39;pct_observations&#39;))</code></pre>
 <div id="htmlwidget-1" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8"],["&lt;= 10","&lt;= 100","&lt;= 1,000","&lt;= 10,000","&lt;= 100,000","&lt;= 1,000,000","&lt;= 10,000,000","&lt;= 100,000,000"],[594003.26231895,13316351.0642052,127213232.058124,512742300.416599,868821204.565926,627717027.841395,200309509.523965,28968994.6681698],[139599,311391,347636,165227,33235,2811,99,2],[0.00024961448912464,0.00559585170444928,0.0534580665535679,0.215466674158364,0.365099612873724,0.263781826058952,0.0841748843119724,0.0121734698498455],[0.139599,0.311391,0.347636,0.165227,0.033235,0.002811,9.9e-05,2e-06]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>bucket<\/th>\n      <th>imps<\/th>\n      <th>observations<\/th>\n      <th>pct_imps<\/th>\n      <th>pct_observations<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatPercentage(this, row, data, 4, 0);\nDTWidget.formatPercentage(this, row, data, 5, 0);\nDTWidget.formatCurrency(this, row, data, 2, '', 0, 3, ',', '.', true);\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7"],["&lt;= 100","&lt;= 1,000","&lt;= 10,000","&lt;= 100,000","&lt;= 1,000,000","&lt;= 10,000,000","&lt;= 100,000,000"],[198.82866657996,148594.753758542,42500245.1839491,1932247161.40935,13721095351.3118,16686569306.7031,3990001179.37271],[3,216,7336,42681,42272,7267,225],[5.46644655866206e-09,4.08535295383049e-06,0.00116846993456379,0.05312375739201,0.377237526934219,0.458768048549074,0.109698106370733],[3e-05,0.00216,0.07336,0.42681,0.42272,0.07267,0.00225]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>bucket<\/th>\n      <th>imps<\/th>\n      <th>observations<\/th>\n      <th>pct_imps<\/th>\n      <th>pct_observations<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatCurrency(this, row, data, 2, \"\", 0, 3, \",\", \".\", true);\nDTWidget.formatPercentage(this, row, data, 4, 0, 3, \",\", \".\");\nDTWidget.formatPercentage(this, row, data, 5, 0, 3, \",\", \".\");\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
 <p>Then get a promotion by making it pretty</p>
 <pre class="r"><code>ggplot(
   bucketed
   , aes(x=bucket, y = pct_imps)
 ) +
   geom_col(fill=&#39;#ed4956&#39;) +
-  geom_text(aes(label=scales::percent(pct_imps)), nudge_y = 0.02) +
+  geom_text(aes(label=scales::percent(pct_imps, accuracy = 1)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs( title=&#39;Percentage of Imps by Bucket&#39;) +
@@ -207,7 +203,7 @@ DT::datatable(bucketed, options = list(dom=&#39;t&#39;)) %&gt;%
   , aes(x=bucket, y = pct_observations)
 ) +
   geom_col(fill=&#39;#3b5998&#39;) +
-  geom_text(aes(label=scales::percent(pct_observations)), nudge_y = 0.02) +
+  geom_text(aes(label=scales::percent(pct_observations, accuracy = 1)), nudge_y = 0.02) +
   theme_bw() +
   theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs( title=&#39;Percentage of Observations by Bucket&#39;) +
@@ -228,7 +224,7 @@ DT::datatable(bucketed, options = list(dom=&#39;t&#39;)) %&gt;%
     
     <p class="small">
     
-       © Copyright 2019 <i class="fa fa-heart" aria-hidden="true"></i> 
+       © Copyright 2020 <i class="fa fa-heart" aria-hidden="true"></i> 
     
     </p>
     <p class="small">
